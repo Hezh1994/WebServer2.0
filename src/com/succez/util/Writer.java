@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,7 @@ public class Writer {
 		InputStream is = null;
 		try {
 			is = new FileInputStream(file);
-			byte[] bytes = new byte[4096];
+			byte[] bytes = new byte[(int) file.length()];
 			while (is.read(bytes) != -1) {
 				soChannel.write(ByteBuffer.wrap(bytes));
 			}
@@ -66,5 +67,17 @@ public class Writer {
 				}
 			}
 		}
+	}
+
+	public static void writeHeadToChannel(String key,
+			SocketChannel socketChannel) throws IOException {
+		Properties properties = new Properties();
+		InputStream is = Writer.class
+				.getResourceAsStream("/httpResponse.properties");
+		properties.load(is);
+		is.close();
+		String value = properties.getProperty(key);
+		byte[] bytes = value.getBytes("utf-8");
+		socketChannel.write(ByteBuffer.wrap(bytes));
 	}
 }

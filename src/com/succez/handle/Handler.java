@@ -86,6 +86,7 @@ public class Handler implements Handle {
 		try {
 			response.response(socketChannel);
 		} catch (CanNotHandleException e) {
+			LOG.error("服务器无法处理该请求");
 		}
 		socketChannel.close();
 	}

@@ -3,11 +3,8 @@ package com.succez.web_server;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.List;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +49,7 @@ public class Response {
 			File file = Seeker.getFile(request.getUrl());
 			if (file.isDirectory()) {
 				try {
+					// 客户端访问目录时，展开该目录。
 					expandDirectory(socketChannel, file);
 				} catch (IOException e) {
 					LOG.error("无法将数据从缓冲区写入到通道中");
@@ -61,12 +59,18 @@ public class Response {
 
 			} else {
 				try {
+					// 客户端访问文件时，下载该文件
 					downloadFile(socketChannel, file);
 				} catch (IOException e) {
-					LOG.error("无法将数据从缓冲区写入到通道中");
+
 				}
 			}
 		} catch (FileNotFoundException e) {
+			try {
+				notFound(socketChannel);
+			} catch (IOException e1) {
+				LOG.error("无法将数据从缓冲区写入到通道中");
+			}
 		}
 	}
 
@@ -84,13 +88,7 @@ public class Response {
 	 */
 	private void downloadFile(SocketChannel socketChannel, File file)
 			throws IOException {
-		Properties properties = new Properties();
-		InputStream is = this.getClass().getResourceAsStream(
-				"httpResponse.properties");
-		properties.load(is);
-		is.close();
-		String fileHead = properties.getProperty("fileHead");
-		Writer.writeToChannel(fileHead, socketChannel);
+		Writer.writeHeadToChannel("fileHead", socketChannel);
 		Writer.writeToChannel(file, socketChannel);
 	}
 
@@ -106,8 +104,8 @@ public class Response {
 	private void expandDirectory(SocketChannel socketChannel, File file)
 			throws IOException, IsNotDirectory {
 		List<File> files = Seeker.getFiles(file);
-		StringBuilder sb = new StringBuilder();
-		sb.append("HTTP/1.1 200 OK\r\nConnection:keep-alive\r\nServer:WebServer\r\n\r\n");
+		Writer.writeHeadToChannel("directoryHead", socketChannel);
+		StringBuilder sb = new StringBuilder(500);
 		sb.append("<html>");
 		sb.append("<head>");
 		sb.append("<title>");
@@ -126,6 +124,34 @@ public class Response {
 		}
 		sb.append("</body>");
 		sb.append("</html>");
-		socketChannel.write(ByteBuffer.wrap(sb.toString().getBytes("utf-8")));
+		Writer.writeToChannel(sb.toString(), socketChannel);
+	}
+
+	/**
+	 * 当客户端请求的资源不存在时，返回此页面。
+	 * 
+	 * @param socketChannel
+	 *            通道
+	 * @throws IOException
+	 */
+	private void notFound(SocketChannel socketChannel) throws IOException {
+		Writer.writeHeadToChannel("notFound", socketChannel);
+		StringBuilder sb = new StringBuilder();
+		sb.append("<html>");
+		sb.append("<head>");
+		sb.append("<title>");
+		sb.append(request.getUrl());
+		sb.append("</title>");
+		sb.append("</head>");
+		sb.append("<body>");
+		sb.append("<h1>");
+		sb.append("404 Not Found");
+		sb.append("</h1>");
+		sb.append("<h3>");
+		sb.append("很抱歉,访问的资源不存在!请检查网址是否正确.");
+		sb.append("</h3>");
+		sb.append("</body>");
+		sb.append("</html>");
+		Writer.writeToChannel(sb.toString(), socketChannel);
 	}
 }

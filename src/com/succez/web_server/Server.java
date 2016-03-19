@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.succez.handle.Handler;
 
 /**
- * 创建并初始化服务器，提供服务器的start和shutDown方法
+ * 创建并初始化服务器，提供服务器的start和shutDown方法.
  * 
  * @author succez
  *
