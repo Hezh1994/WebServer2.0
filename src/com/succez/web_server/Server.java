@@ -11,8 +11,14 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.succez.util.Process;
+import com.succez.handle.Handler;
 
+/**
+ * 创建并初始化服务器，提供服务器的start和shutDown方法
+ * 
+ * @author succez
+ *
+ */
 public class Server {
 	private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 	private static final int TIME_OUT = 5000;
@@ -52,8 +58,7 @@ public class Server {
 	}
 
 	/**
-	 * 启动服务器，服务器轮询，等待客户端的连接，超时时长为10秒。I/O通道操作准备就绪后，将其对应的键传递给
-	 * {@link com.succez.util.Process#process process}进行处理
+	 * 不断的轮询select方法，获取准备好了的通道所关联的key集。获取key集中的每一个key，判断key关联的通道感兴趣的操作并进行相应的处理。
 	 * 
 	 * @throws IOException
 	 */
@@ -66,8 +71,18 @@ public class Server {
 			}
 			Set<SelectionKey> keys = selector.selectedKeys();
 			Iterator<SelectionKey> iterator = keys.iterator();
+			Handler handler = new Handler(4096);
 			while (iterator.hasNext()) {
-				Process.process(iterator.next());
+				SelectionKey key = iterator.next();
+				if (key.isAcceptable()) {
+					handler.handleAccept(key);
+				}
+				if (key.isReadable()) {
+					handler.handleRead(key);
+				}
+				if (key.isWritable()) {
+					handler.handleWrite(key);
+				}
 				iterator.remove();
 			}
 		}
