@@ -116,7 +116,7 @@ public class Response {
 		sb.append("<p style=\"color:blue\">当前路径" + request.getUrl()
 				+ "下的内容为:</p>");
 		for (File f : files) {
-			sb.append("<a href=\"http://192.168.13.157:"
+			sb.append("<a href=\"http://localhost:"
 					+ socketChannel.socket().getLocalPort() + request.getUrl()
 					+ "/" + f.getName() + "\">");
 			sb.append(f.getName() + "</a>");

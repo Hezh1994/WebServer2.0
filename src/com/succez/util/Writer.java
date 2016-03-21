@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.Properties;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +30,7 @@ public class Writer {
 	 *            通道
 	 * @throws IOException
 	 */
-	public static void writeToChannel(String str, SocketChannel soChannel)
-			throws IOException {
+	public static void writeToChannel(String str, SocketChannel soChannel) throws IOException {
 		byte[] bytes = str.getBytes("utf-8");
 		soChannel.write(ByteBuffer.wrap(bytes));
 	}
@@ -45,8 +44,7 @@ public class Writer {
 	 *            通道
 	 * @throws IOException
 	 */
-	public static void writeToChannel(File file, SocketChannel soChannel)
-			throws IOException {
+	public static void writeToChannel(File file, SocketChannel soChannel) throws IOException {
 
 		if (!file.exists()) {
 			throw new FileNotFoundException("文件不存在");
@@ -69,14 +67,10 @@ public class Writer {
 		}
 	}
 
-	public static void writeHeadToChannel(String key,
-			SocketChannel socketChannel) throws IOException {
-		Properties properties = new Properties();
-		InputStream is = Writer.class
-				.getResourceAsStream("/httpResponse.properties");
-		properties.load(is);
-		is.close();
-		String value = properties.getProperty(key);
+	public static void writeHeadToChannel(String key, SocketChannel socketChannel) throws IOException {
+		ConfigReader reader = ConfigReader.getConfigReader();
+		Map<String, String> map = reader.getMap();
+		String value = map.get(key);
 		byte[] bytes = value.getBytes("utf-8");
 		socketChannel.write(ByteBuffer.wrap(bytes));
 	}

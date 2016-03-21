@@ -24,12 +24,10 @@ public class Parser {
 	 *             发生IO错误，读取失败。
 	 */
 	public static Request parse(String requestInfo) throws IOException {
-		BufferedReader reader = new BufferedReader(
-				new StringReader(requestInfo));
+		BufferedReader reader = new BufferedReader(new StringReader(requestInfo));
 		String firstLine = reader.readLine();
-		String[] strArray = firstLine.split(" ");// 有问题，当请求的资源路径中有空格的时候
-		String requestType = strArray[0];
-		String url = strArray[1];
+		String requestType = firstLine.substring(0, firstLine.indexOf(" "));
+		String url = firstLine.substring(firstLine.indexOf(" ") + 1, firstLine.indexOf("HTTP") - 1);
 		return new Request(requestType, url);
 	}
 }

@@ -35,15 +35,12 @@ public class Handler implements Handle {
 	 */
 	public void handleAccept(SelectionKey key) throws IOException {
 		// 获取客户端通道
-		ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key
-				.channel();
+		ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
 		SocketChannel socketChannel = serverSocketChannel.accept();
-		LOG.info("收到来自" + socketChannel.socket().getRemoteSocketAddress()
-				+ "的连接\n");
+		LOG.info("收到来自" + socketChannel.socket().getRemoteSocketAddress() + "的连接\n");
 		// 设置为非阻塞模式，才能注册到选择器上。
 		socketChannel.configureBlocking(false);
-		socketChannel.register(key.selector(), SelectionKey.OP_READ,
-				ByteBuffer.allocate(bufferSize));
+		socketChannel.register(key.selector(), SelectionKey.OP_READ, ByteBuffer.allocate(bufferSize));
 	}
 
 	/**
@@ -55,11 +52,8 @@ public class Handler implements Handle {
 		// 获取该信道所关联的附件，这里为缓冲区
 		ByteBuffer buffer = (ByteBuffer) key.attachment();
 		LOG.info("将通道中的数据写入到缓冲区中\n");
-		long bytesRead = socketChannel.read(buffer);
-		// 如果read（）方法返回-1，说明该通道已到达流的末尾，客户端关闭了连接。
-		if (bytesRead == -1) {
-			socketChannel.close();
-		} else if (bytesRead > 0) {
+		int bytesRead = socketChannel.read(buffer);
+		if (bytesRead > 0) {
 			// 缓冲区中读到了客户端的HttpRequest,将通道感兴趣的操作设置为写。
 			key.interestOps(SelectionKey.OP_WRITE);
 
@@ -80,6 +74,7 @@ public class Handler implements Handle {
 		String requestInfo = URLDecoder.decode(new String(byteArray), "utf-8");
 		LOG.info("获取缓冲区中的数据\n\n" + requestInfo);
 		LOG.info("解析Http请求");
+		buffer.clear();
 		Request request = Parser.parse(requestInfo);
 		LOG.info("响应Http请求");
 		Response response = new Response(request);
