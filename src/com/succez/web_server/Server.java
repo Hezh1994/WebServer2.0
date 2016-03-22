@@ -20,12 +20,17 @@ import com.succez.util.ConfigReader;
  * @author succez
  *
  */
-public class Server {
+public class Server extends Thread {
 	private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 	private static final int TIME_OUT = 5000;
 	private int port;
+	private boolean flag;
 	private Selector selector;
 	private ServerSocketChannel serverSocketChannel;
+
+	public void setFlag(boolean flag) {
+		this.flag = flag;
+	}
 
 	/**
 	 * 构造方法,默认端口号为80.</br>
@@ -50,6 +55,7 @@ public class Server {
 	 */
 	public Server() throws IOException {
 		super();
+		this.flag = true;
 		ConfigReader reader = ConfigReader.getConfigReader();
 		this.port = Integer.valueOf(reader.getMap().get("port"));
 		this.selector = Selector.open();
@@ -65,12 +71,16 @@ public class Server {
 	 * 
 	 * @throws IOException
 	 */
-	public void start() throws IOException {
+	public void run() {
 		LOG.info("服务器启动,正在监听端口号:" + port);
-		while (true) {
-			if (selector.select(TIME_OUT) == 0) {
-				LOG.info("等待连接...");
-				continue;
+		while (flag) {
+			try {
+				if (selector.select(TIME_OUT) == 0) {
+					LOG.info("等待连接...");
+					continue;
+				}
+			} catch (IOException e) {
+				LOG.error("选择器无法正常工作");
 			}
 			Set<SelectionKey> keys = selector.selectedKeys();
 			Iterator<SelectionKey> iterator = keys.iterator();
@@ -79,14 +89,46 @@ public class Server {
 				SelectionKey key = iterator.next();
 				iterator.remove();
 				if (key.isValid() && key.isAcceptable()) {
-					handler.handleAccept(key);
+					try {
+						handler.handleAccept(key);
+					} catch (IOException e) {
+						LOG.error("套接字通道发生IO错误");
+					}
 				}
 				if (key.isValid() && key.isReadable()) {
-					handler.handleRead(key);
+					try {
+						handler.handleRead(key);
+					} catch (IOException e) {
+						LOG.error("套接字通道发生IO错误");
+					}
 				}
 				if (key.isValid() && key.isWritable()) {
-					handler.handleWrite(key);
+					try {
+						handler.handleWrite(key);
+					} catch (IOException e) {
+						LOG.error("套接字通道发生IO错误");
+					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * 关闭选择器以及服务端套接字通道
+	 */
+	public void shutDown() {
+		if (selector != null) {
+			try {
+				selector.close();
+			} catch (IOException e) {
+				LOG.error("无法正常关闭选择器");
+			}
+		}
+		if (serverSocketChannel != null) {
+			try {
+				serverSocketChannel.close();
+			} catch (IOException e) {
+				LOG.error("无法正常关闭服务端套接字通道");
 			}
 		}
 	}
