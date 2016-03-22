@@ -54,7 +54,8 @@ public class Server {
 		this.port = Integer.valueOf(reader.getMap().get("port"));
 		this.selector = Selector.open();
 		this.serverSocketChannel = ServerSocketChannel.open();
-		this.serverSocketChannel.socket().bind(new InetSocketAddress(Integer.valueOf(port)));
+		this.serverSocketChannel.socket().bind(
+				new InetSocketAddress(Integer.valueOf(port)));
 		this.serverSocketChannel.configureBlocking(false);
 		this.serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
 	}
@@ -73,17 +74,17 @@ public class Server {
 			}
 			Set<SelectionKey> keys = selector.selectedKeys();
 			Iterator<SelectionKey> iterator = keys.iterator();
-			Handler handler = new Handler(524);
+			Handler handler = new Handler(4096);
 			while (iterator.hasNext()) {
 				SelectionKey key = iterator.next();
 				iterator.remove();
-				if (key.isAcceptable()) {
+				if (key.isValid() && key.isAcceptable()) {
 					handler.handleAccept(key);
 				}
-				if (key.isReadable()) {
+				if (key.isValid() && key.isReadable()) {
 					handler.handleRead(key);
 				}
-				if (key.isWritable()) {
+				if (key.isValid() && key.isWritable()) {
 					handler.handleWrite(key);
 				}
 			}
