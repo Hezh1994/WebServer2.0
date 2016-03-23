@@ -20,8 +20,7 @@ public class Main {
 		try {
 			server = new Server();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("服务器初始化失败");
 		}
 		server.start();
 		Main main = new Main();
@@ -43,7 +42,11 @@ public class Main {
 				command = scan.nextLine();
 				if ("exit".equals(command)) {
 					server.setFlag(false);
-					server.shutDown();
+					try {
+						server.shutDown();
+					} catch (IOException e) {
+						LOG.error("服务器无法正常关闭");
+					}
 					scan.close();
 					System.exit(0);
 				}

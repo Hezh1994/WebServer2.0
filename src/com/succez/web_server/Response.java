@@ -41,8 +41,7 @@ public class Response {
 	 * @throws CanNotHandleException
 	 *             请求无法处理时，抛出该异常
 	 */
-	public void response(SocketChannel socketChannel)
-			throws CanNotHandleException {
+	public void write(SocketChannel socketChannel) throws CanNotHandleException {
 		LOG.info("响应http请求");
 		ConfigReader reader = ConfigReader.getConfigReader();
 		Map<String, String> map = reader.getMap();

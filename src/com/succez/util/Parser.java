@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.succez.web_server.Request;
 
 /**
@@ -13,6 +16,7 @@ import com.succez.web_server.Request;
  *
  */
 public class Parser {
+	private static final Logger LOG = LoggerFactory.getLogger(Parser.class);
 
 	/**
 	 * 对缓冲区中的HttpRequest进行解析，返回一个Request对象。
@@ -24,10 +28,13 @@ public class Parser {
 	 *             发生IO错误，读取失败。
 	 */
 	public static Request parse(String requestInfo) throws IOException {
-		BufferedReader reader = new BufferedReader(new StringReader(requestInfo));
+		LOG.info("解析请求信息");
+		BufferedReader reader = new BufferedReader(
+				new StringReader(requestInfo));
 		String firstLine = reader.readLine();
 		String requestType = firstLine.substring(0, firstLine.indexOf(" "));
-		String url = firstLine.substring(firstLine.indexOf(" ") + 1, firstLine.indexOf("HTTP") - 1);
+		String url = firstLine.substring(firstLine.indexOf(" ") + 1,
+				firstLine.indexOf("HTTP") - 1);
 		return new Request(requestType, url);
 	}
 }

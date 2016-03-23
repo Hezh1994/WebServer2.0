@@ -84,30 +84,14 @@ public class Server extends Thread {
 			}
 			Set<SelectionKey> keys = selector.selectedKeys();
 			Iterator<SelectionKey> iterator = keys.iterator();
-			Handler handler = new Handler(4096);
+			Handler handler = new Handler();
 			while (iterator.hasNext()) {
 				SelectionKey key = iterator.next();
 				iterator.remove();
-				if (key.isValid() && key.isAcceptable()) {
-					try {
-						handler.handleAccept(key);
-					} catch (IOException e) {
-						LOG.error("套接字通道发生IO错误");
-					}
-				}
-				if (key.isValid() && key.isReadable()) {
-					try {
-						handler.handleRead(key);
-					} catch (IOException e) {
-						LOG.error("套接字通道发生IO错误");
-					}
-				}
-				if (key.isValid() && key.isWritable()) {
-					try {
-						handler.handleWrite(key);
-					} catch (IOException e) {
-						LOG.error("套接字通道发生IO错误");
-					}
+				try {
+					handler.process(key);
+				} catch (IOException e) {
+					LOG.error("无法处理SelectionKey：发生I/O错误");
 				}
 			}
 		}
@@ -115,21 +99,16 @@ public class Server extends Thread {
 
 	/**
 	 * 关闭选择器以及服务端套接字通道
+	 * 
+	 * @throws IOException
+	 *             服务器无法正常关闭
 	 */
-	public void shutDown() {
+	public void shutDown() throws IOException {
 		if (selector != null) {
-			try {
-				selector.close();
-			} catch (IOException e) {
-				LOG.error("无法正常关闭选择器");
-			}
+			selector.close();
 		}
 		if (serverSocketChannel != null) {
-			try {
-				serverSocketChannel.close();
-			} catch (IOException e) {
-				LOG.error("无法正常关闭服务端套接字通道");
-			}
+			serverSocketChannel.close();
 		}
 	}
 }
