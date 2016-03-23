@@ -17,7 +17,8 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class ConfigReader {
-	private static final Logger LOG = LoggerFactory.getLogger(ConfigReader.class);
+	private static final Logger LOG = LoggerFactory
+			.getLogger(ConfigReader.class);
 	private static ConfigReader configReader = null;
 	private static Map<String, String> configMap = new HashMap<String, String>();
 
@@ -28,7 +29,8 @@ public class ConfigReader {
 		Properties properties = new Properties();
 		InputStream is = null;
 		try {
-			is = Writer.class.getResourceAsStream("/httpResponse.properties");
+			is = ConfigReader.class
+					.getResourceAsStream("/httpResponse.properties");
 			properties.load(is);
 			Enumeration<?> e = properties.propertyNames();
 			while (e.hasMoreElements()) {
