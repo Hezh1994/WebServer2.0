@@ -11,7 +11,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.succez.handle.Handler;
+import com.succez.handle.KeyHandler;
 import com.succez.util.ConfigReader;
 
 /**
@@ -84,12 +84,12 @@ public class Server extends Thread {
 			}
 			Set<SelectionKey> keys = selector.selectedKeys();
 			Iterator<SelectionKey> iterator = keys.iterator();
-			Handler handler = new Handler();
+			KeyHandler handler = new KeyHandler();
 			while (iterator.hasNext()) {
 				SelectionKey key = iterator.next();
 				iterator.remove();
 				try {
-					handler.process(key);
+					handler.processKey(key);
 				} catch (IOException e) {
 					LOG.error("无法处理SelectionKey：发生I/O错误");
 				}

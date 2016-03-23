@@ -21,10 +21,10 @@ import com.succez.web_server.Response;
  * @author succez
  *
  */
-public class Handler {
-	private static final Logger LOG = LoggerFactory.getLogger(Handler.class);
+public class KeyHandler {
+	private static final Logger LOG = LoggerFactory.getLogger(KeyHandler.class);
 
-	public Handler() {
+	public KeyHandler() {
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class Handler {
 	 * @param key
 	 * @throws IOException
 	 */
-	public void process(SelectionKey key) throws IOException {
+	public void processKey(SelectionKey key) throws IOException {
 		if (key.isValid() && key.isAcceptable()) {
 			handleAccept(key);
 		}
@@ -80,8 +80,14 @@ public class Handler {
 					"utf-8");
 			LOG.info("获取" + socketChannel.socket().getRemoteSocketAddress()
 					+ "的请求信息\n\n" + requestInfo);
-			Request request = Parser.parse(requestInfo);
-			Response response = new Response(request);
+			Request request = Parser.parse(requestInfo);// 解析请求得到Request
+			RequestHandler handler = new RequestHandler(request, socketChannel);
+			Response response = null;
+			try {
+				response = handler.processRequest(socketChannel);
+			} catch (CanNotHandleException e) {
+				LOG.error("服务器无法处理的请求类型");
+			}
 			key.attach(response);
 			key.interestOps(SelectionKey.OP_WRITE);
 		}
@@ -93,11 +99,7 @@ public class Handler {
 	private void handleWrite(SelectionKey key) throws IOException {
 		SocketChannel socketChannel = (SocketChannel) key.channel();
 		Response response = (Response) key.attachment();
-		try {
-			response.write(socketChannel);
-		} catch (CanNotHandleException e) {
-			LOG.error("服务器无法处理该请求");
-		}
+		response.write(socketChannel);
 		socketChannel.close();
 	}
 }
