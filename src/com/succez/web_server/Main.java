@@ -46,6 +46,7 @@ public class Main {
 						server.shutDown();
 					} catch (IOException e) {
 						LOG.error("服务器无法正常关闭");
+						System.exit(1);
 					}
 					scan.close();
 					System.exit(0);

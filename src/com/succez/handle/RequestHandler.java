@@ -2,6 +2,7 @@ package com.succez.handle;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.channels.SocketChannel;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.succez.exception.CanNotHandleException;
+import com.succez.exception.CanNotTranslateException;
 import com.succez.exception.IsNotDirectory;
 import com.succez.util.ConfigReader;
 import com.succez.util.FileToByte;
@@ -87,14 +89,14 @@ public class RequestHandler {
 					return new Response(responseHead, bytes);
 
 				} else {
+					Response response = null;
 					// 客户端访问文件时，下载该文件
-					responseHead = map.get("fileHead");
 					try {
-						bytes = FileToByte.fileToByte(file);
+						response = downloadFile(file);
 					} catch (Exception e) {
-						LOG.error("无法下载文件" + file.getName() + ":读取文件失败");
+						LOG.error("下载文件" + file.getName() + "失败:无法读取文件");
 					}
-					return new Response(responseHead, bytes);
+					return response;
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -102,6 +104,21 @@ public class RequestHandler {
 			responseHead = map.get("notFound");
 			bytes = returnNotFound();
 			return new Response(responseHead, bytes);
+		}
+	}
+
+	private Response downloadFile(File file) throws CanNotTranslateException,
+			IOException {
+		if (request.getRang() == null) {
+			// 全部下载
+			String responseHead = map.get("fileHead");
+			byte[] bytes = FileToByte.fileToByte(file);
+			return new Response(responseHead, bytes);
+		} else {
+			// 断点续传
+			LOG.info("开始断点续传");
+
+			return null;
 		}
 	}
 
@@ -119,19 +136,19 @@ public class RequestHandler {
 		sb.append("</title>");
 		sb.append("</head>");
 		sb.append("<body>");
-		sb.append("<h1>");
+		sb.append("<p>");
 		sb.append("404 Not Found");
-		sb.append("</h1>");
-		sb.append("<h3>");
+		sb.append("</p>");
+		sb.append("<p>");
 		sb.append("很抱歉,访问的资源不存在!请检查网址是否正确.");
-		sb.append("</h3>");
+		sb.append("</p>");
 		sb.append("</body>");
 		sb.append("</html>");
 		byte[] bytes = null;
 		try {
 			bytes = sb.toString().getBytes(encoding);
 		} catch (UnsupportedEncodingException e) {
-			LOG.error("无法展开目录:不支持的编码类型");
+			LOG.error("无法返回404:不支持的编码类型");
 		}
 		return bytes;
 	}
@@ -163,7 +180,7 @@ public class RequestHandler {
 					+ socketChannel.socket().getLocalPort() + request.getUrl()
 					+ "/" + f.getName() + "\">");
 			sb.append(f.getName() + "</a>");
-			sb.append("</br>");
+			sb.append("<br />");
 		}
 		sb.append("</body>");
 		sb.append("</html>");

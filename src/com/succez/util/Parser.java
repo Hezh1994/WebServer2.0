@@ -31,10 +31,20 @@ public class Parser {
 		LOG.info("解析请求信息");
 		BufferedReader reader = new BufferedReader(
 				new StringReader(requestInfo));
-		String firstLine = reader.readLine();
-		String requestType = firstLine.substring(0, firstLine.indexOf(" "));
-		String url = firstLine.substring(firstLine.indexOf(" ") + 1,
-				firstLine.indexOf("HTTP") - 1);
-		return new Request(requestType, url);
+		// 解析第一行
+		String line = reader.readLine();
+		String requestType = line.substring(0, line.indexOf(" "));
+		String url = line.substring(line.indexOf(" ") + 1,
+				line.indexOf("HTTP") - 1);
+		Request request = new Request(requestType, url);
+		String rang = null;
+		// 解析Rang
+		while ((line = reader.readLine()) != null) {
+			if (line.startsWith("Rang")) {
+				rang = line.substring(line.indexOf(":") + 1);
+			}
+		}
+		request.setRang(rang);
+		return request;
 	}
 }

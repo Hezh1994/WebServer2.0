@@ -9,6 +9,7 @@ package com.succez.web_server;
 public class Request {
 	private String requestType;
 	private String url;
+	private String rang;
 
 	public Request() {
 
@@ -18,6 +19,26 @@ public class Request {
 		super();
 		this.requestType = requestType;
 		this.url = url;
+	}
+
+	public Request(String requestType, String url, String rang) {
+		super();
+		this.requestType = requestType;
+		this.url = url;
+		this.rang = rang;
+	}
+
+	/**
+	 * 获取Http请求头的rang属性
+	 * 
+	 * @return
+	 */
+	public String getRang() {
+		return rang;
+	}
+
+	public void setRang(String rang) {
+		this.rang = rang;
 	}
 
 	/**
@@ -50,6 +71,7 @@ public class Request {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((rang == null) ? 0 : rang.hashCode());
 		result = prime * result
 				+ ((requestType == null) ? 0 : requestType.hashCode());
 		result = prime * result + ((url == null) ? 0 : url.hashCode());
@@ -65,6 +87,11 @@ public class Request {
 		if (getClass() != obj.getClass())
 			return false;
 		Request other = (Request) obj;
+		if (rang == null) {
+			if (other.rang != null)
+				return false;
+		} else if (!rang.equals(other.rang))
+			return false;
 		if (requestType == null) {
 			if (other.requestType != null)
 				return false;
