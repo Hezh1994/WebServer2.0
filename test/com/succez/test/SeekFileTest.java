@@ -23,7 +23,7 @@ public class SeekFileTest {
 		assertEquals(new File("d:/Í¼Æ¬/pic.jpg"), Seeker.getFile("/d/Í¼Æ¬/pic.jpg"));
 
 		expectedEx.expect(FileNotFoundException.class);
-		expectedEx.expectMessage("ÎÄ¼ş²»´æÔÚ");
+		expectedEx.expectMessage("æ–‡ä»¶ä¸å­˜åœ¨");
 		Seeker.getFile("/d/dga");
 	}
 }
