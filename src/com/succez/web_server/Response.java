@@ -1,10 +1,6 @@
 package com.succez.web_server;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
-
-import com.succez.util.ConfigReader;
+import java.io.InputStream;
 
 /**
  * 响应http请求的应答类，包含应答头和请求的资源。
@@ -13,13 +9,28 @@ import com.succez.util.ConfigReader;
  *
  */
 public class Response {
-	private String responseHead;
-	private byte[] data;
+	private byte[] responseHead;
+	private long fileLength;
+	private InputStream resource;
 
-	public Response(String httpHead, byte[] data) {
+	public Response(byte[] responseHead, long fileLength, InputStream resource) {
 		super();
-		this.responseHead = httpHead;
-		this.data = data;
+		this.responseHead = responseHead;
+		this.fileLength = fileLength;
+		this.resource = resource;
+	}
+
+	/**
+	 * 获取资源大小
+	 * 
+	 * @return
+	 */
+	public long getFileLength() {
+		return fileLength;
+	}
+
+	public void setFileLength(long fileLength) {
+		this.fileLength = fileLength;
 	}
 
 	/**
@@ -27,7 +38,7 @@ public class Response {
 	 * 
 	 * @return
 	 */
-	public String getHttpHead() {
+	public byte[] getHttpHead() {
 		return responseHead;
 	}
 
@@ -36,8 +47,8 @@ public class Response {
 	 * 
 	 * @return
 	 */
-	public byte[] getData() {
-		return data;
+	public InputStream getData() {
+		return resource;
 	}
 
 	/**
@@ -46,13 +57,4 @@ public class Response {
 	 * @param socketChannel
 	 * @throws IOException
 	 */
-	public void write(SocketChannel socketChannel) throws IOException {
-		ConfigReader reader = ConfigReader.getConfigReader();
-		String encoding = reader.getMap().get("encoding");
-		byte[] bytes = responseHead.getBytes(encoding);
-		// 将http应答头写入通道中
-		socketChannel.write(ByteBuffer.wrap(bytes));
-		// 将客户端请求的资源写入通道中
-		socketChannel.write(ByteBuffer.wrap(data));
-	}
 }

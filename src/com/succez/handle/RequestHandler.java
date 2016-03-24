@@ -1,8 +1,10 @@
 package com.succez.handle;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.channels.SocketChannel;
 import java.util.List;
@@ -12,10 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.succez.exception.CanNotHandleException;
-import com.succez.exception.CanNotTranslateException;
 import com.succez.exception.IsNotDirectory;
 import com.succez.util.ConfigReader;
-import com.succez.util.FileToByte;
 import com.succez.util.Seeker;
 import com.succez.web_server.Request;
 import com.succez.web_server.Response;
@@ -64,15 +64,17 @@ public class RequestHandler {
 		if (!(map.get("requestType")).equals(request.getRequestType())) {
 			throw new CanNotHandleException("无法处理的请求类型");
 		}
-		byte[] bytes = null;
-		String responseHead;
+		InputStream is = null;
+		byte[] responseHead;
 		try {
 			File file = Seeker.getFile(request.getUrl());
 			if (file.isDirectory()) {
 				// 客户端访问目录时，展开该目录
-				responseHead = map.get("directoryHead");
-				bytes = expandDirectory(file);
-				Response response = new Response(responseHead, bytes);
+				responseHead = getResponseHead("directoryHead");
+				byte[] bytes = expandDirectory(file);
+				long fileLength = bytes.length;
+				is = new ByteArrayInputStream(bytes);
+				Response response = new Response(responseHead, fileLength, is);
 				return response;
 			} else {
 				String s = file.getName();
@@ -80,77 +82,29 @@ public class RequestHandler {
 				String imageType = map.get("imageType");
 				if (imageType.contains(suf)) {
 					// 图片类型的文件，预览图片
-					responseHead = map.get("directoryHead");
-					try {
-						bytes = FileToByte.fileToByte(file);
-					} catch (Exception e) {
-						LOG.error("无法预览" + file.getName() + ":读取文件失败");
-					}
-					return new Response(responseHead, bytes);
+					responseHead = getResponseHead("directoryHead");
+					is = new FileInputStream(file);
+					return new Response(responseHead, file.length(), is);
 
 				} else {
-					Response response = null;
-					// 客户端访问文件时，下载该文件
-					try {
-						response = downloadFile(file);
-					} catch (Exception e) {
-						LOG.error("下载文件" + file.getName() + "失败：无法读取文件");
-					}
-					return response;
+					// 下载文件
+					responseHead = getResponseHead("fileHead");
+					is = new FileInputStream(file);
+					return new Response(responseHead, file.length(), is);
 				}
 			}
 		} catch (FileNotFoundException e) {
 			// 文件不存在时，返回404 NotFound
-			responseHead = map.get("notFound");
-			bytes = returnNotFound();
-			return new Response(responseHead, bytes);
+			responseHead = getResponseHead("notFound");
+			File file = null;
+			try {
+				file = new File("D:/error.html");
+				is = new FileInputStream(file);
+			} catch (FileNotFoundException e1) {
+				LOG.error("无法返回error页面：页面文件不存在");
+			}
+			return new Response(responseHead, file.length(), is);
 		}
-	}
-
-	private Response downloadFile(File file) throws CanNotTranslateException,
-			IOException {
-		if (request.getRang() == null) {
-			// 全部下载
-			String responseHead = map.get("fileHead");
-			byte[] bytes = FileToByte.fileToByte(file);
-			return new Response(responseHead, bytes);
-		} else {
-			// 断点续传
-			LOG.info("开始断点续传");
-
-			return null;
-		}
-	}
-
-	/**
-	 * 客户端请求的资不存在时，返回该页面。
-	 * 
-	 * @return
-	 */
-	private byte[] returnNotFound() {
-		StringBuilder sb = new StringBuilder(500);
-		sb.append("<html>");
-		sb.append("<head>");
-		sb.append("<title>");
-		sb.append(request.getUrl());
-		sb.append("</title>");
-		sb.append("</head>");
-		sb.append("<body>");
-		sb.append("<p>");
-		sb.append("404 Not Found");
-		sb.append("</p>");
-		sb.append("<p>");
-		sb.append("很抱歉，访问的页面不错在！请检查网址是否正确");
-		sb.append("</p>");
-		sb.append("</body>");
-		sb.append("</html>");
-		byte[] bytes = null;
-		try {
-			bytes = sb.toString().getBytes(encoding);
-		} catch (UnsupportedEncodingException e) {
-			LOG.error("无法返回404：不支持的编码类型");
-		}
-		return bytes;
 	}
 
 	/**
@@ -188,7 +142,23 @@ public class RequestHandler {
 		try {
 			bytes = sb.toString().getBytes(encoding);
 		} catch (UnsupportedEncodingException e) {
-			LOG.error("无法展开目录：不支持的编码类型");
+			LOG.error("无法展开目录：不支持的编码格式");
+		}
+		return bytes;
+	}
+
+	/**
+	 * 根据key查找配置文件获取Http应答头的信息，并转换为字节数组返回。
+	 * 
+	 * @param key
+	 * @return
+	 */
+	private byte[] getResponseHead(String key) {
+		byte[] bytes = null;
+		try {
+			bytes = map.get(key).getBytes(encoding);
+		} catch (UnsupportedEncodingException e) {
+			LOG.error("无法获取Http应答头:不支持的编码格式");
 		}
 		return bytes;
 	}

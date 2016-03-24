@@ -10,7 +10,6 @@ import com.succez.util.Parser;
 import com.succez.web_server.Request;
 
 public class ParserTest {
-
 	@Test
 	public void test() throws IOException {
 		assertEquals(new Request("GET", "/d/test.txt"),

@@ -7,6 +7,7 @@ public class IsNotDirectory extends Exception {
 	public IsNotDirectory() {
 		super();
 	}
+
 	public IsNotDirectory(String message) {
 		super(message);
 	}

@@ -1,6 +1,7 @@
 package com.succez.handle;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -102,7 +103,18 @@ public class KeyHandler {
 	private void handleWrite(SelectionKey key) throws IOException {
 		SocketChannel socketChannel = (SocketChannel) key.channel();
 		Response response = (Response) key.attachment();
-		response.write(socketChannel);
+		// 获取response中的应答头和资源
+		byte[] head = response.getHttpHead();
+		InputStream data = response.getData();
+		long fileLength = response.getFileLength();
+		// 将Http应答头写入通道中
+		socketChannel.write(ByteBuffer.wrap(head));
+
+		// 将请求的资源写入通道中
+		byte[] buffer = new byte[(int) fileLength];
+		while (data.read(buffer) != -1) {
+			socketChannel.write(ByteBuffer.wrap(buffer));
+		}
 		socketChannel.close();
 	}
 }
