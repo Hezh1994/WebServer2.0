@@ -20,7 +20,7 @@ public class SeekFileTest {
 	public void test() throws FileNotFoundException {
 		assertEquals(new File("d:/document"), Seeker.getFile("/d/document"));
 		assertEquals(new File("d:\\"), Seeker.getFile("/d"));
-		assertEquals(new File("d:/ͼƬ/pic.jpg"), Seeker.getFile("/d/ͼƬ/pic.jpg"));
+		assertEquals(new File("d:/图片/pic.jpg"), Seeker.getFile("/d/图片/pic.jpg"));
 
 		expectedEx.expect(FileNotFoundException.class);
 		expectedEx.expectMessage("文件不存在");
