@@ -11,16 +11,16 @@ public class Main {
 	private static Server server;
 
 	/**
-	 * ³ÌĞòÈë¿Ú
+	 * ç¨‹åºå…¥å£
 	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		LOG.info("³õÊ¼»¯²¢Æô¶¯·şÎñÆ÷");
+		LOG.info("åˆå§‹åŒ–å¹¶å¯åŠ¨æœåŠ¡å™¨");
 		try {
 			server = new Server();
 		} catch (IOException e) {
-			LOG.error("·şÎñÆ÷³õÊ¼»¯Ê§°Ü");
+			LOG.error("æœåŠ¡å™¨åˆå§‹åŒ–å¤±è´¥");
 		}
 		server.start();
 		Main main = new Main();
@@ -29,7 +29,7 @@ public class Main {
 	}
 
 	/**
-	 * ÄÚ²¿Àà£¬ÓÃÀ´¼àÌı¿ØÖÆÌ¨ÊäÈëµÄÃüÁî£¬µ±¼àÌıµ½¿ØÖÆÌ¨ÊäÈëexitÊ±£¬ÊÍ·Å×ÊÔ´£¬ÍË³ö³ÌĞò¡£
+	 * å†…éƒ¨ç±»ï¼Œç”¨æ¥ç›‘å¬æ§åˆ¶è¾“å…¥çš„å‘½ä»¤ï¼Œå½“ç›‘å¬åˆ°æ§åˆ¶å°è¾“å…¥exitæ—¶ï¼Œé‡Šæ”¾èµ„æºï¼Œé€€å‡ºç¨‹åºã€‚
 	 * 
 	 * @author succez
 	 *
@@ -45,7 +45,7 @@ public class Main {
 					try {
 						server.shutDown();
 					} catch (IOException e) {
-						LOG.error("·şÎñÆ÷ÎŞ·¨Õı³£¹Ø±Õ");
+						LOG.error("æœåŠ¡å™¨æ— æ³•æ­£å¸¸å…³é—­");
 						System.exit(1);
 					}
 					scan.close();

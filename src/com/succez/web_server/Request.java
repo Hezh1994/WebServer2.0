@@ -1,7 +1,7 @@
 package com.succez.web_server;
 
 /**
- * ·â×°ÁË²¿·ÖhttpÇëÇóĞÅÏ¢µÄÀà£¬°üÀ¨ÇëÇóÀàĞÍrequestType¡¢ÇëÇó×ÊÔ´Â·¾¶url¡£ Ìá¹©requestTypeµÄurlµÄget¡¢set·½·¨¡£
+ * å°è£…äº†éƒ¨åˆ†httpè¯·æ±‚ä¿¡æ¯çš„ç±»ï¼ŒåŒ…æ‹¬è¯·æ±‚ç±»å‹requestTypeã€è¯·æ±‚èµ„æºè·¯å¾„urlç­‰ã€‚æä¾›getã€setæ–¹æ³•ã€‚
  * 
  * @author succez
  *
@@ -29,7 +29,7 @@ public class Request {
 	}
 
 	/**
-	 * »ñÈ¡HttpÇëÇóÍ·µÄrangÊôĞÔ
+	 * è·å–httpè¯·æ±‚å¤´çš„rangå±æ€§
 	 * 
 	 * @return
 	 */
@@ -42,18 +42,18 @@ public class Request {
 	}
 
 	/**
-	 * ·µ»ØÇëÇóµÄÀàĞÍ£¬ÈçGET POST
+	 * è¿”å›è¯·æ±‚ç±»å‹ï¼Œå¦‚GET POSt
 	 * 
-	 * @return ÇëÇóÀàĞÍ
+	 * @return è¯·æ±‚ç±»å‹
 	 */
 	public String getRequestType() {
 		return requestType;
 	}
 
 	/**
-	 * ·µ»ØÇëÇóµÄ×ÊÔ´Â·¾¶£¬ĞÎÈç/d/document
+	 * è¿”å›è¯·æ±‚çš„èµ„æºè·¯å¾„ï¼Œå½¢å¦‚/d/document
 	 * 
-	 * @return ÇëÇó×ÊÔ´Â·¾¶
+	 * @return è¯·æ±‚èµ„æºè·¯å¾„
 	 */
 	public String getUrl() {
 		return url;

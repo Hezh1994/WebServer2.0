@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.succez.exception.CanNotTranslateException;
 
 /**
- * ½«·Ö¼ş×ª»»Îª×Ö½ÚÊı¾İµÄÀà
+ * å°†æ–‡ä»¶è½¬æ¢ä¸ºå­—èŠ‚æ•°ç»„çš„ç±»
  * 
  * @author succez
  *
@@ -19,7 +19,7 @@ public class FileToByte {
 	private static final Logger LOG = LoggerFactory.getLogger(FileToByte.class);
 
 	/**
-	 * ½«Ö¸¶¨ÎÄ¼ş×ª»»ÎªÒ»¸ö×Ö½ÚÊı×é²¢·µ»Ø,µ±ÎÄ¼ş¹ı´ó½«ÎŞ·¨½øĞĞ×ª»»
+	 * å°†æŒ‡å®šæ–‡ä»¶è½¬æ¢ä¸ºæ‰¾ä¸€ä¸ªå­—èŠ‚æ•°ç»„å¹¶è¿”å›ï¼Œå½“æ–‡ä»¶è¿‡å¤§æ—¶å°†æ— æ³•è¿›è¡Œè½¬æ¢
 	 * 
 	 * @param File
 	 * @return byte[]
@@ -33,7 +33,7 @@ public class FileToByte {
 		try {
 			long fileLength = file.length();
 			if (fileLength > Integer.MAX_VALUE) {
-				throw new CanNotTranslateException("ÎÄ¼şÌ«´ó£¬ÎŞ·¨½øĞĞ×ª»»");
+				throw new CanNotTranslateException("æ–‡ä»¶å¤ªå¤§ï¼Œæ— æ³•è¿›è¡Œè½¬æ¢");
 			}
 			fis = new FileInputStream(file);
 			byte[] buffer = new byte[(int) fileLength];
@@ -53,7 +53,7 @@ public class FileToByte {
 					fis.close();
 				}
 			} catch (Exception e) {
-				LOG.error("ÊäÈëÁ÷¹Ø±ÕÊ§°Ü");
+				LOG.error("è¾“å…¥æµå…³é—­å¤±è´¥");
 			}
 		}
 	}

@@ -21,7 +21,7 @@ import com.succez.web_server.Request;
 import com.succez.web_server.Response;
 
 /**
- * ´¦ÀíRequest£¬µÃµ½Ò»¸öResponse¡£
+ * å¤„ç†Requestï¼Œå¾—åˆ°ä¸€ä¸ªResponse
  * 
  * @author succez
  *
@@ -35,7 +35,7 @@ public class RequestHandler {
 	private Map<String, String> map;
 
 	/**
-	 * ¶ÁÈ¡ÅäÖÃ·Ö¼ş£¬µÃµ½map¼¯ºÏ£¬ÉèÖÃ±àÂë¸ñÊ½¡£
+	 * è¯»å–é…ç½®æ–‡ä»¶ï¼Œå¾—åˆ°mapé›†åˆï¼Œè®¾ç½®ç¼–ç æ ¼å¼
 	 * 
 	 * @param request
 	 * @param socketChannel
@@ -50,26 +50,26 @@ public class RequestHandler {
 	}
 
 	/**
-	 * ´¦Àí¿Í»§¶ËÇëÇó£¬»ñÈ¡ÇëÇó×ÊÔ´µÄ×Ö½ÚÊı×é£¬½«HttpÓ¦´ğÍ·ºÍÇëÇóµÄ×ÊÔ´°ü×°µ½ResponseÖĞ¡£
+	 * å¤„ç†å®¢æˆ·ç«¯è¯·æ±‚ï¼Œè·å–è¯·æ±‚èµ„æºçš„å­—èŠ‚æ•°ç»„ï¼Œå°†httpåº”ç­”å¤´å’Œè¯·æ±‚çš„èµ„æºåŒ…è£…åˆ°responseä¸­ã€‚
 	 * 
 	 * @param socketChannel
-	 *            ¿Í»§¶ËÍ¨µÀ
-	 * @return Response
+	 *            å®¢æˆ·ç«¯é€šé“
+	 * @return
 	 * @throws CanNotHandleException
-	 *             ÇëÇóÀàĞÍÎŞ·¨´¦ÀíÊ±£¬Å×³ö¸ÃÒì³£
+	 *             è¯·æ±‚æ— æ³•å¤„ç†æ—¶ï¼ŒæŠ›å‡ºè¯¥å¼‚å¸¸ã€‚
 	 */
 	public Response processRequest(SocketChannel socketChannel)
 			throws CanNotHandleException {
-		LOG.info("´¦ÀíÇëÇó");
+		LOG.info("å¤„ç†è¯·æ±‚");
 		if (!(map.get("requestType")).equals(request.getRequestType())) {
-			throw new CanNotHandleException("ÎŞ·¨´¦ÀíµÄÇëÇóÀàĞÍ");
+			throw new CanNotHandleException("æ— æ³•å¤„ç†çš„è¯·æ±‚ç±»å‹");
 		}
 		byte[] bytes = null;
 		String responseHead;
 		try {
 			File file = Seeker.getFile(request.getUrl());
 			if (file.isDirectory()) {
-				// ¿Í»§¶Ë·ÃÎÊÄ¿Â¼Ê±£¬Õ¹¿ª¸ÃÄ¿Â¼¡£
+				// å®¢æˆ·ç«¯è®¿é—®ç›®å½•æ—¶ï¼Œå±•å¼€è¯¥ç›®å½•
 				responseHead = map.get("directoryHead");
 				bytes = expandDirectory(file);
 				Response response = new Response(responseHead, bytes);
@@ -79,28 +79,28 @@ public class RequestHandler {
 				String suf = s.substring(s.indexOf(".") + 1, s.length());
 				String imageType = map.get("imageType");
 				if (imageType.contains(suf)) {
-					// Í¼Æ¬ÀàĞÍµÄÎÄ¼ş£¬Ô¤ÀÀÍ¼Æ¬
+					// å›¾ç‰‡ç±»å‹çš„æ–‡ä»¶ï¼Œé¢„è§ˆå›¾ç‰‡
 					responseHead = map.get("directoryHead");
 					try {
 						bytes = FileToByte.fileToByte(file);
 					} catch (Exception e) {
-						LOG.error("ÎŞ·¨Ô¤ÀÀ" + file.getName() + ":¶ÁÈ¡ÎÄ¼şÊ§°Ü");
+						LOG.error("æ— æ³•é¢„è§ˆ" + file.getName() + ":è¯»å–æ–‡ä»¶å¤±è´¥");
 					}
 					return new Response(responseHead, bytes);
 
 				} else {
 					Response response = null;
-					// ¿Í»§¶Ë·ÃÎÊÎÄ¼şÊ±£¬ÏÂÔØ¸ÃÎÄ¼ş
+					// å®¢æˆ·ç«¯è®¿é—®æ–‡ä»¶æ—¶ï¼Œä¸‹è½½è¯¥æ–‡ä»¶
 					try {
 						response = downloadFile(file);
 					} catch (Exception e) {
-						LOG.error("ÏÂÔØÎÄ¼ş" + file.getName() + "Ê§°Ü:ÎŞ·¨¶ÁÈ¡ÎÄ¼ş");
+						LOG.error("ä¸‹è½½æ–‡ä»¶" + file.getName() + "å¤±è´¥ï¼šæ— æ³•è¯»å–æ–‡ä»¶");
 					}
 					return response;
 				}
 			}
 		} catch (FileNotFoundException e) {
-			// ÎÄ¼ş²»´æÔÚÊ±£¬·µ»Ø404 NotFound
+			// æ–‡ä»¶ä¸å­˜åœ¨æ—¶ï¼Œè¿”å›404 NotFound
 			responseHead = map.get("notFound");
 			bytes = returnNotFound();
 			return new Response(responseHead, bytes);
@@ -110,20 +110,20 @@ public class RequestHandler {
 	private Response downloadFile(File file) throws CanNotTranslateException,
 			IOException {
 		if (request.getRang() == null) {
-			// È«²¿ÏÂÔØ
+			// å…¨éƒ¨ä¸‹è½½
 			String responseHead = map.get("fileHead");
 			byte[] bytes = FileToByte.fileToByte(file);
 			return new Response(responseHead, bytes);
 		} else {
-			// ¶ÏµãĞø´«
-			LOG.info("¿ªÊ¼¶ÏµãĞø´«");
+			// æ–­ç‚¹ç»­ä¼ 
+			LOG.info("å¼€å§‹æ–­ç‚¹ç»­ä¼ ");
 
 			return null;
 		}
 	}
 
 	/**
-	 * ¿Í»§¶ËÇëÇóµÄ×ÊÔ´²»´æÔÚÊ±£¬·µ»Ø¸ÃÒ³Ãæ¡£
+	 * å®¢æˆ·ç«¯è¯·æ±‚çš„èµ„ä¸å­˜åœ¨æ—¶ï¼Œè¿”å›è¯¥é¡µé¢ã€‚
 	 * 
 	 * @return
 	 */
@@ -140,7 +140,7 @@ public class RequestHandler {
 		sb.append("404 Not Found");
 		sb.append("</p>");
 		sb.append("<p>");
-		sb.append("ºÜ±§Ç¸,·ÃÎÊµÄ×ÊÔ´²»´æÔÚ!Çë¼ì²éÍøÖ·ÊÇ·ñÕıÈ·.");
+		sb.append("å¾ˆæŠ±æ­‰ï¼Œè®¿é—®çš„é¡µé¢ä¸é”™åœ¨ï¼è¯·æ£€æŸ¥ç½‘å€æ˜¯å¦æ­£ç¡®");
 		sb.append("</p>");
 		sb.append("</body>");
 		sb.append("</html>");
@@ -148,13 +148,13 @@ public class RequestHandler {
 		try {
 			bytes = sb.toString().getBytes(encoding);
 		} catch (UnsupportedEncodingException e) {
-			LOG.error("ÎŞ·¨·µ»Ø404:²»Ö§³ÖµÄ±àÂëÀàĞÍ");
+			LOG.error("æ— æ³•è¿”å›404ï¼šä¸æ”¯æŒçš„ç¼–ç ç±»å‹");
 		}
 		return bytes;
 	}
 
 	/**
-	 * ½«Ä¿Â¼ÖĞµÄÄÚÈİĞ´Èëµ½htmlÒ³ÃæÖĞ£¬²¢½«¸ÃhtmlÒÔ×Ö½ÚÊı¾İĞÎÊ½·µ»Ø¡£
+	 * å°†ç›®å½•ä¸­çš„å†…å®¹å†™å…¥åˆ°htmlé¡µé¢ä¸­ï¼Œå¹¶å°†è¯¥htmlä»¥å­—èŠ‚æ•°ç»„çš„å½¢å¼è¿”å›ã€‚
 	 * 
 	 * @param file
 	 */
@@ -163,7 +163,7 @@ public class RequestHandler {
 		try {
 			files = Seeker.getFiles(file);
 		} catch (IsNotDirectory e) {
-			LOG.error("Õ¹¿ªÄ¿Â¼Ê§°Ü!ÊÔÍ¼Õ¹¿ªÒ»¸ö·ÇÄ¿Â¼ÎÄ¼ş");
+			LOG.error("å±•å¼€ç›®å½•å¤±è´¥ï¼è¯•å›¾å±•å¼€ä¸€ä¸ªéç›®å½•æ–‡ä»¶");
 		}
 		StringBuilder sb = new StringBuilder(500);
 		sb.append("<html>");
@@ -173,8 +173,8 @@ public class RequestHandler {
 		sb.append("</title>");
 		sb.append("</head>");
 		sb.append("<body>");
-		sb.append("<p style=\"color:blue\">µ±Ç°Â·¾¶" + request.getUrl()
-				+ "ÏÂµÄÄÚÈİÎª:</p>");
+		sb.append("<p style=\"color:blue\">å½“å‰è·¯å¾„" + request.getUrl()
+				+ "ä¸‹çš„å†…å®¹ä¸º:</p>");
 		for (File f : files) {
 			sb.append("<a href=\"http://localhost:"
 					+ socketChannel.socket().getLocalPort() + request.getUrl()
@@ -188,7 +188,7 @@ public class RequestHandler {
 		try {
 			bytes = sb.toString().getBytes(encoding);
 		} catch (UnsupportedEncodingException e) {
-			LOG.error("ÎŞ·¨Õ¹¿ªÄ¿Â¼:²»Ö§³ÖµÄ±àÂëÀàĞÍ");
+			LOG.error("æ— æ³•å±•å¼€ç›®å½•ï¼šä¸æ”¯æŒçš„ç¼–ç ç±»å‹");
 		}
 		return bytes;
 	}

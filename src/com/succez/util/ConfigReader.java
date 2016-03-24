@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * ¶ÁÈ¡ÅäÖÃÎÄ¼şµÄ¹¤¾ßÀà
+ * è¯»å–é…ç½®æ–‡ä»¶çš„å·¥å…·ç±»
  * 
  * @author biu
  *
@@ -23,7 +23,7 @@ public class ConfigReader {
 	private static Map<String, String> configMap = new HashMap<String, String>();
 
 	/**
-	 * Ò»´Î½«ÅäÖÃÎÄ¼şµÄĞÅÏ¢È«²¿¶ÁÈ¡³öÀ´´æ·ÅÔÚHashMapÖĞ¡£
+	 * ä¸€æ¬¡å°†é…ç½®æ–‡ä»¶çš„ä¿¡æ¯å…¨éƒ¨è¯»å–å‡ºæ¥å­˜æ”¾åœ¨HashMapä¸­ã€‚
 	 */
 	private ConfigReader() {
 		Properties properties = new Properties();
@@ -39,7 +39,7 @@ public class ConfigReader {
 				configMap.put(key, value);
 			}
 		} catch (Exception e) {
-			LOG.error("¶ÁÈ¡ÅäÖÃÎÄ¼şÊ§°Ü");
+			LOG.error("è¯»å–é…ç½®æ–‡ä»¶å¤±è´¥");
 		} finally {
 			try {
 				if (is != null) {
@@ -52,7 +52,7 @@ public class ConfigReader {
 	}
 
 	/**
-	 * µ¥ÀıÄ£Ê½
+	 * å•ä¾‹æ¨¡å¼
 	 * 
 	 * @return ConfigReader
 	 */

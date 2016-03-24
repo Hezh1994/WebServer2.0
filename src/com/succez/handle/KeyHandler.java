@@ -16,7 +16,7 @@ import com.succez.web_server.Request;
 import com.succez.web_server.Response;
 
 /**
- * ´¦ÀíSelectionKeyµÄÀà¡£
+ * å¤„ç†SelectionKeyçš„ç±»
  * 
  * @author succez
  *
@@ -28,7 +28,7 @@ public class KeyHandler {
 	}
 
 	/**
-	 * ´¦ÀíSelectionKey£¬ÅĞ¶ÏkeyËù¹ØÁªµÄÍ¨µÀµÄ×´Ì¬¡£
+	 * å¤„ç†SelectionKeyï¼Œåˆ¤æ–­keyæ‰€å…³è”çš„é€šé“çš„çŠ¶æ€
 	 * 
 	 * @param key
 	 * @throws IOException
@@ -45,48 +45,48 @@ public class KeyHandler {
 		}
 	}
 
-	// ·şÎñ¶ËÍ¨µÀÒÑ¾­×¼±¸ºÃ½ÓÊÜĞÂµÄ¿Í»§¶ËÁ¬½Ó¡£½«ĞÂ×¢²áµÄ¿Í»§¶ËÍ¨µÀ×¢²áµ½Ñ¡ÔñÆ÷£¬ÉèÖÃ¸ÃÍ¨µÀÎªµÄkeyÊôĞÔÎªOP_READ¡£
+	// æœåŠ¡ç«¯é€šé“å·²ç»å‡†å¤‡å¥½æ¥å—æ–°çš„å®¢æˆ·ç«¯è¿æ¥ã€‚å°†æ–°æ³¨å†Œçš„å®¢æˆ·ç«¯é€šé“æ³¨å†Œåˆ°é€‰æ‹©å™¨ï¼Œè®¾ç½®è¯¥é€šé“å…³è”çš„keyçš„å±æ€§ä¸ºOP_READ
 	private void handleAccept(SelectionKey key) throws IOException {
-		// »ñÈ¡¿Í»§¶ËÍ¨µÀ
+		// è·å–å®¢æˆ·ç«¯é€šé“
 		ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key
 				.channel();
 		SocketChannel socketChannel = serverSocketChannel.accept();
-		LOG.info("ÊÕµ½À´×Ô" + socketChannel.socket().getRemoteSocketAddress()
-				+ "µÄÁ¬½Ó\n");
-		// ÉèÖÃÎª·Ç×èÈûÄ£Ê½£¬²ÅÄÜ×¢²áµ½Ñ¡ÔñÆ÷ÉÏ¡£
+		LOG.info("æ”¶åˆ°æ¥è‡ª" + socketChannel.socket().getRemoteSocketAddress()
+				+ "çš„è¿æ¥\n");
+		// è®¾ç½®ä¸ºéé˜»å¡æ¨¡å¼æ‰èƒ½æ³¨å†Œåˆ°é€‰æ‹©å™¨ä¸Š
 		socketChannel.configureBlocking(false);
 		socketChannel.register(key.selector(), SelectionKey.OP_READ);
 	}
 
-	// ¿Í»§¶ËÍ¨µÀÒÑ¾­×¼±¸ºÃ¶ÁÈ¡Êı¾İµ½»º³åÇøÖĞ¡£½«Í¨µÀÖĞµÄÊı¾İ¶ÁÈ¡µ½»º³åÇøÖĞ£¬ È»ºó ¶Ô¶ÁÈ¡µ½»º³åÇøÖĞµÄHttpRequest½øĞĞ½âÎöµÃµ½Request¡£
+	// å®¢æˆ·ç«¯é€šé“å·²ç»å‡†å¤‡å¥½è¯»å–æ•°æ®åˆ°ç¼“å†²åŒºä¸­ã€‚å°†é€šé“ä¸­çš„æ•°æ®è¯»å–åˆ°ç¼“å†²åŒºä¸­ï¼Œç„¶åå¯¹è¯»å–åˆ°ç¼“å†²åŒºä¸­çš„HttpRequestè¿›è¡Œè§£æå¾—åˆ°Request
 	private void handleRead(SelectionKey key) throws IOException {
 		SocketChannel socketChannel = (SocketChannel) key.channel();
 		ByteBuffer buffer = ByteBuffer.allocate(4096);
 		int bytesRead = socketChannel.read(buffer);
 		if (bytesRead == -1) {
 			/**
-			 * Èç¹ûÒ»¸öÏß³Ì¹Ø±ÕÁËÄ³¸öÌ×½Ó×ÖµÄÊäÈë¶Ë£¬¶øÍ¬Ê±ÁíÒ»¸öÏß³Ì±»×èÈûÔÚ¸ÃÌ×½Ó×ÖÍ¨µÀÉÏµÄ¶ÁÈ¡²Ù×÷ÖĞ£¬ÄÇÃ´´¦ÓÚ×èÈûÏß³ÌÖĞµÄ¶ÁÈ¡²Ù×÷½«Íê³É£¬
-			 * ¶ø²»¶ÁÈ¡ÈÎºÎ×Ö½ÚÇÒ·µ»Ø -1¡£ÕâÀïËµÃ÷¿Í»§¶ËÔÚÊÕµ½Êı¾İºó¹Ø±ÕÁËÁ¬½Ó¡£
+			 * å¦‚æœä¸€ä¸ªçº¿ç¨‹å…³é—­äº†æŸä¸ªå¥—æ¥å­—çš„è¾“å…¥ç«¯ï¼Œè€ŒåŒæ—¶å¦ä¸€ä¸ªçº¿ç¨‹è¢«é˜»å¡åœ¨è¯¥å¥—æ¥å­—é€šé“çš„è¯»å–æ“ä½œä¸­ï¼Œ
+			 * é‚£ä¹ˆå¤„äºé˜»å¡çº¿ç¨‹ä¸­çš„è¯»å–æ“ä½œå°†å®Œæˆè€Œä¸è¯»å–ä»»ä½• å­—èŠ‚ä¸”è¿”å›-1ã€‚è¿™é‡Œè¯´æ˜å®¢æˆ·ç«¯åœ¨æ”¶åˆ°æ•°æ®åå…³é—­äº†è¿æ¥ã€‚
 			 */
 			socketChannel.close();
-			LOG.info("¿Í»§¶Ë¹Ø±ÕÁËÁ¬½Ó"
+			LOG.info("å®¢æˆ·ç«¯å…³é—­äº†è¿æ¥"
 					+ socketChannel.socket().getRemoteSocketAddress() + "\n");
 		} else if (bytesRead > 0) {
-			LOG.info("½«Í¨µÀÖĞµÄÊı¾İ¶ÁÈëµ½»º³åÇøÖĞ\n");
-			// »º³åÇøÖĞ¶Áµ½ÁË¿Í»§¶ËµÄHttpRequest,»ñÈ¡»º³åÇøÖĞµÄÇëÇóĞÅÏ¢¡£
+			LOG.info("å°†é€šé“ä¸­çš„æ•°æ®è¯»å…¥åˆ°ç¼“å†²åŒºä¸­\n");
+			// ç¼“å†²åŒºä¸­è¯»åˆ°äº†å®¢æˆ·ç«¯çš„è¯·æ±‚ä¿¡æ¯ï¼Œè·å–ç¼“å†²åŒºä¸­çš„è¯·æ±‚ä¿¡æ¯
 			buffer.flip();
 			byte[] byteArray = buffer.array();
 			String requestInfo = URLDecoder.decode(new String(byteArray),
 					"utf-8");
-			LOG.info("»ñÈ¡" + socketChannel.socket().getRemoteSocketAddress()
-					+ "µÄÇëÇóĞÅÏ¢\n\n" + requestInfo);
-			Request request = Parser.parse(requestInfo);// ½âÎöÇëÇóµÃµ½Request
+			LOG.info("è·å–" + socketChannel.socket().getRemoteSocketAddress()
+					+ "çš„è¯·æ±‚ä¿¡æ¯\n\n" + requestInfo);
+			Request request = Parser.parse(requestInfo);// è§£æè¯·æ±‚å¾—åˆ°Request
 			RequestHandler handler = new RequestHandler(request, socketChannel);
 			Response response = null;
 			try {
 				response = handler.processRequest(socketChannel);
 			} catch (CanNotHandleException e) {
-				LOG.error("·şÎñÆ÷ÎŞ·¨´¦ÀíµÄÇëÇóÀàĞÍ");
+				LOG.error("æœåŠ¡å™¨æ— æ³•å¤„ç†çš„è¯·æ±‚ç±»å‹");
 			}
 			key.attach(response);
 			key.interestOps(SelectionKey.OP_WRITE);
@@ -94,7 +94,10 @@ public class KeyHandler {
 	}
 
 	/**
-	 * ¿Í»§¶ËÍ¨µÀÒÑ¾­×¼±¸ºÃ½«Êı¾İ³å»º³åÇøĞ´ÈëÍ¨µÀÖĞ¡£»ñÈ¡KeyÉÏ¸½¼ÓµÄResponse¶ÔÏó£¬½«¿Í»§¶ËÇëÇóµÄÊı¾İĞ´Èëµ½»º³åÇøÖĞ¡£
+	 * å®¢æˆ·ç«¯é€šé“å·²ç»å‡†å¤‡å¥½å°†æ•°æ®ä»ç¼“å†²åŒºå†™å…¥åˆ°é€šé“ä¸­ã€‚è·å–Keyä¸Šé™„åŠ çš„responseå¯¹è±¡ï¼Œå°†å®¢æˆ·ç«¯è¯·æ±‚çš„æ•°æ®å†™å…¥åˆ°ç¼“å†²åŒºä¸­ã€‚
+	 * 
+	 * @param key
+	 * @throws IOException
 	 */
 	private void handleWrite(SelectionKey key) throws IOException {
 		SocketChannel socketChannel = (SocketChannel) key.channel();

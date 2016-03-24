@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.succez.web_server.Request;
 
 /**
- * ½âÎöÆ÷£¬Í¨¹ı¾²Ì¬·½·¨parse¶Ô»º³åÇøÖĞµÄhttpÇëÇó½øĞĞ½âÎö£¬µÃµ½Ò»¸öRequest¶ÔÏó¡£
+ * è§£æå™¨ï¼Œé€šè¿‡é™æ€æ–¹æ³•parseå¯¹ç¼“å†²åŒºä¸­çš„httpè¯·æ±‚è¿›è¡Œè§£æï¼Œå¾—åˆ°ä¸€ä¸ªRequestå¯¹è±¡ã€‚
  * 
  * @author succez
  *
@@ -19,26 +19,26 @@ public class Parser {
 	private static final Logger LOG = LoggerFactory.getLogger(Parser.class);
 
 	/**
-	 * ¶Ô»º³åÇøÖĞµÄHttpRequest½øĞĞ½âÎö£¬·µ»ØÒ»¸öRequest¶ÔÏó¡£
+	 * å¯¹ç¼“å†²åŒºä¸­çš„HttpRequestè¿›è¡Œè§£æï¼Œè¿”å›ä¸€ä¸ªRequestå¯¹è±¡ã€‚
 	 * 
-	 * @param request
-	 *            »º³åÇøÖĞµÄÇëÇóĞÅÏ¢
-	 * @return Request¶ÔÏó
+	 * @param requestInfo
+	 *            ç¼“å†²åŒºä¸­çš„è¯·æ±‚ä¿¡æ¯
+	 * @return
 	 * @throws IOException
-	 *             ·¢ÉúIO´íÎó£¬¶ÁÈ¡Ê§°Ü¡£
+	 *             å‘ç”ŸI/Oé”™è¯¯ï¼Œè¯»å–å¤±è´¥ã€‚
 	 */
 	public static Request parse(String requestInfo) throws IOException {
-		LOG.info("½âÎöÇëÇóĞÅÏ¢");
+		LOG.info("è§£æè¯·æ±‚ä¿¡æ¯");
 		BufferedReader reader = new BufferedReader(
 				new StringReader(requestInfo));
-		// ½âÎöµÚÒ»ĞĞ
+		// è§£æç¬¬ä¸€è¡Œ
 		String line = reader.readLine();
 		String requestType = line.substring(0, line.indexOf(" "));
 		String url = line.substring(line.indexOf(" ") + 1,
 				line.indexOf("HTTP") - 1);
 		Request request = new Request(requestType, url);
 		String rang = null;
-		// ½âÎöRang
+		// è§£æRang
 		while ((line = reader.readLine()) != null) {
 			if (line.startsWith("Rang")) {
 				rang = line.substring(line.indexOf(":") + 1);

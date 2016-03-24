@@ -7,15 +7,13 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.util.Iterator;
 import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.succez.handle.KeyHandler;
 import com.succez.util.ConfigReader;
 
 /**
- * ´´½¨²¢³õÊ¼»¯·şÎñÆ÷£¬Ìá¹©·şÎñÆ÷µÄstartºÍshutDown·½·¨.
+ * åˆ›å»ºå¹¶åˆå§‹åŒ–æœåŠ¡å™¨ï¼Œæä¾›æœåŠ¡å™¨çš„startå’ŒshutDownæ–¹æ³•
  * 
  * @author succez
  *
@@ -33,25 +31,25 @@ public class Server extends Thread {
 	}
 
 	/**
-	 * ¹¹Ôì·½·¨,Ä¬ÈÏ¶Ë¿ÚºÅÎª80.</br>
+	 * æ„é€ æ–¹æ³•ï¼Œé»˜è®¤ç«¯å£å·ä¸º80</br>
 	 * <p>
-	 * 1.´ò¿ªÑ¡ÔñÆ÷.
+	 * 1.æ‰“å¼€é€‰æ‹©å™¨
 	 * </p>
 	 * <p>
-	 * 2.´ò¿ª·şÎñÆ÷Ì×½Ó×ÖÍ¨µÀ.
+	 * 2.æ‰“å¼€æœåŠ¡å™¨å¥—æ¥å­—é€šé“
 	 * </p>
 	 * <p>
-	 * 3.Ì×½Ó×Ö°ó¶¨µ½Ö¸¶¨µÄ¶Ë¿Ú.
+	 * 3.å°†å¥—æ¥å­—ç»‘å®šåˆ°æŒ‡å®šçš„ç«¯å£
 	 * </p>
 	 * <p>
-	 * 5.ÉèÖÃ·şÎñÆ÷Ì×½Ó×ÖÍ¨µÀÎª·Ç×èÈûÄ£Ê½.
+	 * 4.è®¾ç½®æœåŠ¡å™¨å¥—æ¥å­—é€šé“ä¸ºéé˜»å¡æ¨¡å¼
 	 * </p>
 	 * <p>
-	 * 6.²¢ÏòÑ¡ÔñÆ÷×¢²á¸ÃÍ¨µÀ.
+	 * 5.å‘é€‰æ‹©å™¨æ³¨å†Œå¥—è¯¥é€šé“
 	 * </p>
 	 * 
 	 * @throws IOException
-	 *             ·şÎñÆ÷³õÊ¼»¯Ê§°Ü,³öÏÖIO´íÎóÊ±,Å×³ö¸ÃÒì³£.
+	 *             æœåŠ¡å™¨åˆå§‹åŒ–å¤±è´¥ï¼Œå‡ºç°I/Oé”™è¯¯ï¼ŒæŠ›å‡ºè¯¥å¼‚å¸¸
 	 */
 	public Server() throws IOException {
 		super();
@@ -67,20 +65,18 @@ public class Server extends Thread {
 	}
 
 	/**
-	 * ²»¶ÏµÄÂÖÑ¯select·½·¨£¬»ñÈ¡×¼±¸ºÃÁËµÄÍ¨µÀËù¹ØÁªµÄkey¼¯¡£»ñÈ¡key¼¯ÖĞµÄÃ¿Ò»¸ökey£¬ÅĞ¶Ïkey¹ØÁªµÄÍ¨µÀ¸ĞĞËÈ¤µÄ²Ù×÷²¢½øĞĞÏàÓ¦µÄ´¦Àí¡£
-	 * 
-	 * @throws IOException
+	 * ä¸æ–­çš„è½®è¯¢selectæ–¹æ³•ï¼Œè·å–å‡†å¤‡å¥½è¿›è¡ŒI/Oæ“ä½œçš„é€šé“æ‰€å…³è”çš„keyé›†ã€‚
 	 */
 	public void run() {
-		LOG.info("·şÎñÆ÷Æô¶¯,ÕıÔÚ¼àÌı¶Ë¿ÚºÅ:" + port);
+		LOG.info("æœåŠ¡å™¨å¯åŠ¨ï¼Œæ­£åœ¨ç›‘å¬ç«¯å£å·ï¼š" + port);
 		while (flag) {
 			try {
 				if (selector.select(TIME_OUT) == 0) {
-					LOG.info("µÈ´ıÁ¬½Ó...");
+					LOG.info("ç­‰å¾…è¿æ¥...");
 					continue;
 				}
 			} catch (IOException e) {
-				LOG.error("Ñ¡ÔñÆ÷ÎŞ·¨Õı³£¹¤×÷");
+				LOG.error("é€‰æ‹©å™¨æ— æ³•æ­£å¸¸å·¥ä½œ");
 			}
 			Set<SelectionKey> keys = selector.selectedKeys();
 			Iterator<SelectionKey> iterator = keys.iterator();
@@ -91,17 +87,17 @@ public class Server extends Thread {
 				try {
 					handler.processKey(key);
 				} catch (IOException e) {
-					LOG.error("ÎŞ·¨´¦ÀíSelectionKey£º·¢ÉúI/O´íÎó");
+					LOG.error("æ— æ³•å¤„ç†SelectionKeyï¼šå‘ç”ŸI/Oé”™è¯¯");
 				}
 			}
 		}
 	}
 
 	/**
-	 * ¹Ø±ÕÑ¡ÔñÆ÷ÒÔ¼°·şÎñ¶ËÌ×½Ó×ÖÍ¨µÀ
+	 * å…³é—­é€‰æ‹©å™¨ä»¥åŠæœåŠ¡ç«¯å¥—æ¥å­—é€šé“
 	 * 
 	 * @throws IOException
-	 *             ·şÎñÆ÷ÎŞ·¨Õı³£¹Ø±Õ
+	 *             æœåŠ¡å™¨æ— æ³•æ­£å¸¸å…³é—­
 	 */
 	public void shutDown() throws IOException {
 		if (selector != null) {

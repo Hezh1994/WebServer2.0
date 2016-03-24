@@ -1,7 +1,7 @@
 package com.succez.exception;
 
 /**
- * 当请求无法处理时，抛出该异常
+ * 褰撹姹傛棤娉曞鐞嗘椂锛屾姏鍑鸿寮傚父
  * 
  * @author succez
  *

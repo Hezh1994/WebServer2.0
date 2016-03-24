@@ -7,7 +7,7 @@ import java.nio.channels.SocketChannel;
 import com.succez.util.ConfigReader;
 
 /**
- * ÏìÓ¦httpÇëÇóµÄÓ¦´ğÀà£¬°üº¬Ó¦´ğÍ·ºÍÇëÇóµÄ×ÊÔ´¡£
+ * å“åº”httpè¯·æ±‚çš„åº”ç­”ç±»ï¼ŒåŒ…å«åº”ç­”å¤´å’Œè¯·æ±‚çš„èµ„æºã€‚
  * 
  * @author succez
  *
@@ -23,7 +23,7 @@ public class Response {
 	}
 
 	/**
-	 * ·µ»ØHttpÓ¦´ğÍ·µÄĞÅÏ¢
+	 * è¿”å›httpåº”ç­”å¤´çš„ä¿¡æ¯
 	 * 
 	 * @return
 	 */
@@ -32,7 +32,7 @@ public class Response {
 	}
 
 	/**
-	 * ·µ»ØÇëÇóµÄ×ÊÔ´
+	 * è¿”å›è¯·æ±‚çš„èµ„æº
 	 * 
 	 * @return
 	 */
@@ -41,7 +41,7 @@ public class Response {
 	}
 
 	/**
-	 * ÏìÓ¦¿Í»§¶ËµÄÇëÇó£¬½«HttpÓ¦´ğÍ·Óë·µ»Ø¸ø¿Í»§¶ËµÄ×ÊÔ´Ğ´ÈëÍ¨µÀÖĞ¡£
+	 * å“åº”å®¢æˆ·ç«¯çš„è¯·æ±‚ï¼Œå°†Httpåº”ç­”å¤´ä¸å®¢æˆ·ç«¯è¯·æ±‚çš„èµ„æºå†™å…¥é€šé“ä¸­
 	 * 
 	 * @param socketChannel
 	 * @throws IOException
@@ -50,9 +50,9 @@ public class Response {
 		ConfigReader reader = ConfigReader.getConfigReader();
 		String encoding = reader.getMap().get("encoding");
 		byte[] bytes = responseHead.getBytes(encoding);
-		// ½«httpÓ¦´ğÍ·Ğ´ÈëÍ¨µÀÖĞ
+		// å°†httpåº”ç­”å¤´å†™å…¥é€šé“ä¸­
 		socketChannel.write(ByteBuffer.wrap(bytes));
-		// ½«¿Í»§¶ËÇëÇóµÄ×ÊÔ´Ğ´ÈëÍ¨µÀÖĞ
+		// å°†å®¢æˆ·ç«¯è¯·æ±‚çš„èµ„æºå†™å…¥é€šé“ä¸­
 		socketChannel.write(ByteBuffer.wrap(data));
 	}
 }

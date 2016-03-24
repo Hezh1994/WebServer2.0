@@ -8,21 +8,19 @@ import java.util.List;
 import com.succez.exception.IsNotDirectory;
 
 /**
- * ¸ù¾İHttpÇëÇóÖĞµÄÂ·¾¶²éÕÒÎÄ¼şµÄ¹¤¾ßÀà¡£Èç¹ûÊÇÎÄ¼ş£¬Ôò·µ»ØFile¶ÔÏó;Èç¹ûÊÇ¼¯ºÏ£¬Ôò·µ»ØÒ»¸öFile¶ÔÏóµÄList¼¯ºÏ
+ * æ ¹æ®httpè¯·æ±‚ä¸­çš„è·¯å¾„æŸ¥æ‰¾æ–‡ä»¶çš„å·¥å…·ç±»ã€‚å¦‚æœæ˜¯æ–‡ä»¶ï¼Œåˆ™è¿”å›Fileå¯¹è±¡ï¼›å¦‚æœæ˜¯é›†åˆï¼Œåˆ™è¿”å›Listé›†åˆã€‚
  * 
  * @author succez
  *
  */
 public class Seeker {
-
 	/**
-	 * ¸ù¾İurl²éÕÒ²¢·µ»ØÖ¸¶¨ÎÄ¼ş¡£Èç:url =
-	 * "/d/document/test.txt",ÔòÄÜ·µ»ØÂ·¾¶ÎªD:\document\test.txtµÄÎÄ¼ş¡£
+	 * æ ¹æ®urlæŸ¥æ‰¾å¹¶è¿”å›æŒ‡å®šæ–‡ä»¶ã€‚å¦‚url = "/d/document/test.txt"ï¼Œåˆ™è¿”å›è·¯å¾„D:\document\test.txtçš„æ–‡ä»¶
 	 * 
 	 * @param url
 	 * @return
 	 * @throws FileNotFoundException
-	 *             ÎÄ¼ş²»´æÔÚÊ±£¬Å×³ö¸ÃÒì³£¡£
+	 *             æ–‡ä»¶ä¸å­˜åœ¨æ—¶ï¼ŒæŠ›å‡ºè¯¥å¼‚å¸¸ã€‚
 	 */
 	public static File getFile(String url) throws FileNotFoundException {
 		String str = url.substring(1);
@@ -34,19 +32,19 @@ public class Seeker {
 		}
 		File file = new File(filePath);
 		if (!file.exists()) {
-			throw new FileNotFoundException("ÎÄ¼ş²»´æÔÚ");
+			throw new FileNotFoundException("æ–‡ä»¶ä¸å­˜åœ¨");
 		}
 		return file;
 	}
 
 	/**
-	 * ±éÀúµ±Ç°Ä¿Â¼£¬·µ»ØÒ»¸öFile¶ÔÏóµÄList¼¯ºÏ£¬¼¯ºÏÖĞµÄÃ¿¸öÔªËØ¶ÔÓ¦µ±Ç°Ä¿Â¼ÏÂµÃµ½Ã¿¸öÎÄ¼şºÍÄ¿Â¼¡£
+	 * éå†å½“å‰ç›®å½•ï¼Œè¿”å›ä¸€ä¸ªåŒ…å«Fileå¯¹è±¡çš„Listé›†åˆï¼Œé›†åˆä¸­çš„æ¯ä¸ªå…ƒç´ å¯¹åº”å½“å‰ç›®å½•ä¸‹çš„æ¯ä¸ªæ–‡ä»¶æˆ–ç›®å½•
 	 * 
 	 * @param file
-	 *            Ä¿Â¼
+	 *            ç›®å½•
 	 * @return
 	 * @throws IsNotDirectory
-	 *             µ±´«µİ¹ıÀ´µÄ²ÎÊı²»ÊÇÒ»¸öÄ¿Â¼£¬¶øÊÇÎÄ¼şÊ±£¬Å×³ö¸ÃÒì³£¡£
+	 *             å½“ä¼ é€’è¿‡æ¥çš„å‚æ•°ä¸æ˜¯ä¸€ä¸ªç›®å½•ï¼Œè€Œæ˜¯æ–‡ä»¶æ—¶ï¼ŒæŠ›å‡ºè¯¥å¼‚å¸¸
 	 */
 	public static List<File> getFiles(File file) throws IsNotDirectory {
 		if (!file.isDirectory()) {
