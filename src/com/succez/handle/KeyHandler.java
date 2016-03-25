@@ -111,6 +111,7 @@ public class KeyHandler {
 		byte[] head = response.getHttpHead();
 		InputStream data = response.getData();
 		long fileLength = response.getFileLength();
+		LOG.info("响应客户端请求，写回请求的资源");
 		// 将Http应答头写入通道中
 		socketChannel.write(ByteBuffer.wrap(head));
 
@@ -120,20 +121,17 @@ public class KeyHandler {
 		int off = 0;
 		int numRead;
 		while ((numRead = is.read(bytes, off, len)) != -1) {
-			LOG.info("读取了" + numRead + "字节的数据到数组中");
 			buffer.clear();
 			buffer.put(bytes, 0, numRead);
 			buffer.flip();
 			while (buffer.hasRemaining()) {
-				int i = socketChannel.write(buffer);
-				LOG.info("将" + i + "字节的数据从缓冲区写入到通道中");
+				/**
+				 * 必须在循环中进行，SocketChannel.write方法无法保证能将多少字节的数据从缓冲区写入到通道中。
+				 * hasRemaining方法判断此缓冲区position和limit之间是否有元素，当至少还有一个元素的时候返回true
+				 */
+				socketChannel.write(buffer);
 			}
 		}
-		// byte[] b = new byte[(int) fileLength];
-		// while (is.read(b) != -1) {
-		// socketChannel.write(ByteBuffer.wrap(b));
-		// }
-
 		socketChannel.close();
 	}
 }
