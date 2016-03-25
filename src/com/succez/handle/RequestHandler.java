@@ -82,7 +82,7 @@ public class RequestHandler {
 				String imageType = map.get("imageType");
 				if (imageType.contains(suf)) {
 					// 图片类型的文件，预览图片
-					responseHead = getResponseHead("directoryHead");
+					responseHead = getResponseHead("image");
 					is = new FileInputStream(file);
 					return new Response(responseHead, file.length(), is);
 

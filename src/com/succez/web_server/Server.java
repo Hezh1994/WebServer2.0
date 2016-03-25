@@ -80,7 +80,7 @@ public class Server extends Thread {
 			}
 			Set<SelectionKey> keys = selector.selectedKeys();
 			Iterator<SelectionKey> iterator = keys.iterator();
-			KeyHandler handler = new KeyHandler();
+			KeyHandler handler = new KeyHandler(4096);
 			while (iterator.hasNext()) {
 				SelectionKey key = iterator.next();
 				iterator.remove();
@@ -100,6 +100,7 @@ public class Server extends Thread {
 	 *             服务器无法正常关闭
 	 */
 	public void shutDown() throws IOException {
+		LOG.info("关闭服务器");
 		if (selector != null) {
 			selector.close();
 		}

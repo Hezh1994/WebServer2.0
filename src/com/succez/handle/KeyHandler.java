@@ -1,5 +1,7 @@
 package com.succez.handle;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
@@ -24,8 +26,10 @@ import com.succez.web_server.Response;
  */
 public class KeyHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(KeyHandler.class);
+	private ByteBuffer buffer;
 
-	public KeyHandler() {
+	public KeyHandler(int BufferSize) {
+		this.buffer = ByteBuffer.allocate(BufferSize);
 	}
 
 	/**
@@ -62,7 +66,7 @@ public class KeyHandler {
 	// 客户端通道已经准备好读取数据到缓冲区中。将通道中的数据读取到缓冲区中，然后对读取到缓冲区中的HttpRequest进行解析得到Request
 	private void handleRead(SelectionKey key) throws IOException {
 		SocketChannel socketChannel = (SocketChannel) key.channel();
-		ByteBuffer buffer = ByteBuffer.allocate(4096);
+		buffer.clear();
 		int bytesRead = socketChannel.read(buffer);
 		if (bytesRead == -1) {
 			/**
@@ -110,11 +114,26 @@ public class KeyHandler {
 		// 将Http应答头写入通道中
 		socketChannel.write(ByteBuffer.wrap(head));
 
-		// 将请求的资源写入通道中
-		byte[] buffer = new byte[(int) fileLength];
-		while (data.read(buffer) != -1) {
-			socketChannel.write(ByteBuffer.wrap(buffer));
+		DataInputStream is = new DataInputStream(new BufferedInputStream(data));
+		int len = (int) (fileLength > 4096 ? 4096 : fileLength);
+		byte[] bytes = new byte[len];
+		int off = 0;
+		int numRead;
+		while ((numRead = is.read(bytes, off, len)) != -1) {
+			LOG.info("读取了" + numRead + "字节的数据到数组中");
+			buffer.clear();
+			buffer.put(bytes, 0, numRead);
+			buffer.flip();
+			while (buffer.hasRemaining()) {
+				int i = socketChannel.write(buffer);
+				LOG.info("将" + i + "字节的数据从缓冲区写入到通道中");
+			}
 		}
+		// byte[] b = new byte[(int) fileLength];
+		// while (is.read(b) != -1) {
+		// socketChannel.write(ByteBuffer.wrap(b));
+		// }
+
 		socketChannel.close();
 	}
 }
