@@ -20,7 +20,7 @@ import com.succez.util.ConfigReader;
  */
 public class Server extends Thread {
 	private static final Logger LOG = LoggerFactory.getLogger(Server.class);
-	private static final int TIME_OUT = 5000;
+	private static final int TIME_OUT = 10000;
 	private int port;
 	private boolean flag;
 	private Selector selector;

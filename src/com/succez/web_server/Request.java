@@ -9,7 +9,8 @@ package com.succez.web_server;
 public class Request {
 	private String requestType;
 	private String url;
-	private String rang;
+	private String RANGE;
+	private int port;
 
 	public Request() {
 
@@ -25,7 +26,7 @@ public class Request {
 		super();
 		this.requestType = requestType;
 		this.url = url;
-		this.rang = rang;
+		this.RANGE = rang;
 	}
 
 	/**
@@ -34,11 +35,11 @@ public class Request {
 	 * @return
 	 */
 	public String getRang() {
-		return rang;
+		return RANGE;
 	}
 
 	public void setRang(String rang) {
-		this.rang = rang;
+		this.RANGE = rang;
 	}
 
 	/**
@@ -71,7 +72,7 @@ public class Request {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((rang == null) ? 0 : rang.hashCode());
+		result = prime * result + ((RANGE == null) ? 0 : RANGE.hashCode());
 		result = prime * result
 				+ ((requestType == null) ? 0 : requestType.hashCode());
 		result = prime * result + ((url == null) ? 0 : url.hashCode());
@@ -87,10 +88,10 @@ public class Request {
 		if (getClass() != obj.getClass())
 			return false;
 		Request other = (Request) obj;
-		if (rang == null) {
-			if (other.rang != null)
+		if (RANGE == null) {
+			if (other.RANGE != null)
 				return false;
-		} else if (!rang.equals(other.rang))
+		} else if (!RANGE.equals(other.RANGE))
 			return false;
 		if (requestType == null) {
 			if (other.requestType != null)
@@ -103,6 +104,14 @@ public class Request {
 		} else if (!url.equals(other.url))
 			return false;
 		return true;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
 	}
 
 }

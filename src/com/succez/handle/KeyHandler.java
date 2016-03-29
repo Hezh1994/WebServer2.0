@@ -1,9 +1,6 @@
 package com.succez.handle;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -13,6 +10,7 @@ import java.nio.channels.SocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.succez.appliction.HttpAppliction;
 import com.succez.exception.CanNotHandleException;
 import com.succez.util.Parser;
 import com.succez.web_server.Request;
@@ -86,14 +84,8 @@ public class KeyHandler {
 			LOG.info("获取" + socketChannel.socket().getRemoteSocketAddress()
 					+ "的请求信息\n\n" + requestInfo);
 			Request request = Parser.parse(requestInfo);// 解析请求得到Request
-			RequestHandler handler = new RequestHandler(request, socketChannel);
-			Response response = null;
-			try {
-				response = handler.processRequest(socketChannel);
-			} catch (CanNotHandleException e) {
-				LOG.error("服务器无法处理的请求类型");
-			}
-			key.attach(response);
+			request.setPort(socketChannel.socket().getLocalPort());
+			key.attach(request);
 			key.interestOps(SelectionKey.OP_WRITE);
 		}
 	}
@@ -106,31 +98,13 @@ public class KeyHandler {
 	 */
 	private void handleWrite(SelectionKey key) throws IOException {
 		SocketChannel socketChannel = (SocketChannel) key.channel();
-		Response response = (Response) key.attachment();
-		// 获取response中的应答头和资源
-		byte[] head = response.getHttpHead();
-		InputStream data = response.getData();
-		long fileLength = response.getFileLength();
-		LOG.info("响应客户端请求，写回请求的资源");
-		// 将Http应答头写入通道中
-		socketChannel.write(ByteBuffer.wrap(head));
-
-		DataInputStream is = new DataInputStream(new BufferedInputStream(data));
-		int len = (int) (fileLength > 4096 ? 4096 : fileLength);
-		byte[] bytes = new byte[len];
-		int off = 0;
-		int numRead;
-		while ((numRead = is.read(bytes, off, len)) != -1) {
-			buffer.clear();
-			buffer.put(bytes, 0, numRead);
-			buffer.flip();
-			while (buffer.hasRemaining()) {
-				/**
-				 * 必须在循环中进行，SocketChannel.write方法无法保证能将多少字节的数据从缓冲区写入到通道中。
-				 * hasRemaining方法判断此缓冲区position和limit之间是否有元素，当至少还有一个元素的时候返回true
-				 */
-				socketChannel.write(buffer);
-			}
+		Request request = (Request) key.attachment();
+		HttpAppliction appliction = new HttpAppliction();
+		Response response = new Response(socketChannel);
+		try {
+			appliction.service(request, response);
+		} catch (CanNotHandleException e) {
+			LOG.error("请求类型无法处理，只支持处理GET请求");
 		}
 		socketChannel.close();
 	}

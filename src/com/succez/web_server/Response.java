@@ -1,6 +1,11 @@
 package com.succez.web_server;
 
-import java.io.InputStream;
+import java.nio.channels.SocketChannel;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.succez.util.AppOutputStream;
 
 /**
  * 响应http请求的应答类，包含应答头和请求的资源。
@@ -9,52 +14,20 @@ import java.io.InputStream;
  *
  */
 public class Response {
-	private byte[] responseHead;
-	private long fileLength;
-	private InputStream resource;
+	private static final Logger LOG = LoggerFactory.getLogger(Response.class);
+	private AppOutputStream outputStream;
 
-	public Response(byte[] responseHead, long fileLength, InputStream resource) {
-		super();
-		this.responseHead = responseHead;
-		this.fileLength = fileLength;
-		this.resource = resource;
+	public Response(SocketChannel socketChannel) {
+		LOG.info("响应客户端请求");
+		this.outputStream = new AppOutputStream(socketChannel);
 	}
 
 	/**
-	 * 获取资源大小
+	 * 返回将数据发送给客户端的输出流
 	 * 
 	 * @return
 	 */
-	public long getFileLength() {
-		return fileLength;
+	public AppOutputStream getOutputStream() {
+		return outputStream;
 	}
-
-	public void setFileLength(long fileLength) {
-		this.fileLength = fileLength;
-	}
-
-	/**
-	 * 返回http应答头的信息
-	 * 
-	 * @return
-	 */
-	public byte[] getHttpHead() {
-		return responseHead;
-	}
-
-	/**
-	 * 返回请求的资源
-	 * 
-	 * @return
-	 */
-	public InputStream getData() {
-		return resource;
-	}
-
-	/**
-	 * 响应客户端的请求，将Http应答头与客户端请求的资源写入通道中
-	 * 
-	 * @param socketChannel
-	 * @throws IOException
-	 */
 }
