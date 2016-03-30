@@ -7,8 +7,11 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.succez.exception.CanNotHandleException;
 import com.succez.handle.KeyHandler;
 import com.succez.util.ConfigReader;
 
@@ -88,6 +91,8 @@ public class Server extends Thread {
 					handler.processKey(key);
 				} catch (IOException e) {
 					LOG.error("无法处理SelectionKey：发生I/O错误");
+				} catch (CanNotHandleException e1) {
+					LOG.error("无法处理的请求类型，只支持处理GET请求");
 				}
 			}
 		}

@@ -1,18 +1,25 @@
 package com.succez.handle;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.succez.appliction.HttpAppliction;
+import com.succez.appliction.ShowDirectory;
 import com.succez.exception.CanNotHandleException;
+import com.succez.util.ConfigReader;
 import com.succez.util.Parser;
+import com.succez.util.Seeker;
 import com.succez.web_server.Request;
 import com.succez.web_server.Response;
 
@@ -25,9 +32,14 @@ import com.succez.web_server.Response;
 public class KeyHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(KeyHandler.class);
 	private ByteBuffer buffer;
+	private Map<String, String> map;
+	private String encoding;
 
 	public KeyHandler(int BufferSize) {
 		this.buffer = ByteBuffer.allocate(BufferSize);
+		ConfigReader reader = ConfigReader.getConfigReader();
+		this.map = reader.getMap();
+		this.encoding = map.get("encoding");
 	}
 
 	/**
@@ -35,8 +47,10 @@ public class KeyHandler {
 	 * 
 	 * @param key
 	 * @throws IOException
+	 * @throws CanNotHandleException
 	 */
-	public void processKey(SelectionKey key) throws IOException {
+	public void processKey(SelectionKey key) throws IOException,
+			CanNotHandleException {
 		if (key.isValid() && key.isAcceptable()) {
 			handleAccept(key);
 		}
@@ -62,7 +76,8 @@ public class KeyHandler {
 	}
 
 	// 客户端通道已经准备好读取数据到缓冲区中。将通道中的数据读取到缓冲区中，然后对读取到缓冲区中的HttpRequest进行解析得到Request
-	private void handleRead(SelectionKey key) throws IOException {
+	private void handleRead(SelectionKey key) throws CanNotHandleException,
+			IOException {
 		SocketChannel socketChannel = (SocketChannel) key.channel();
 		buffer.clear();
 		int bytesRead = socketChannel.read(buffer);
@@ -80,13 +95,48 @@ public class KeyHandler {
 			buffer.flip();
 			byte[] byteArray = buffer.array();
 			String requestInfo = URLDecoder.decode(new String(byteArray),
-					"utf-8");
+					encoding);
 			LOG.info("获取" + socketChannel.socket().getRemoteSocketAddress()
 					+ "的请求信息\n\n" + requestInfo);
 			Request request = Parser.parse(requestInfo);// 解析请求得到Request
 			request.setPort(socketChannel.socket().getLocalPort());
-			key.attach(request);
-			key.interestOps(SelectionKey.OP_WRITE);
+			if (!map.get("requestType").equals(request.getRequestType())) {
+				throw new CanNotHandleException("无法处理的请求类型");
+			}
+			try {
+				File file = Seeker.getFile(request.getUrl());
+				if (file.isDirectory()) {
+					// 展开目录，由展开目录的程序进行处理
+					Response response = new Response(socketChannel);
+					byte[] bytes = map.get("directoryHead").getBytes(encoding);
+					socketChannel.write(ByteBuffer.wrap(bytes));
+					ShowDirectory app = new ShowDirectory();
+					app.service(request, response);
+					socketChannel.close();
+				} else {
+					String s = file.getName();
+					String suf = s.substring(s.indexOf(".") + 1, s.length());
+					String imageType = map.get("imageType");
+					if (imageType.contains(suf)) {
+						// 访问的是图片
+						byte[] bytes = map.get("image").getBytes(encoding);
+						socketChannel.write(ByteBuffer.wrap(bytes));
+						FileChannel channel = new FileInputStream(file)
+								.getChannel();
+						key.attach(channel);
+						key.interestOps(SelectionKey.OP_WRITE);
+					} else {
+						byte[] bytes = map.get("fileHead").getBytes(encoding);
+						socketChannel.write(ByteBuffer.wrap(bytes));
+						FileChannel channel = new FileInputStream(file)
+								.getChannel();
+						key.attach(channel);
+						key.interestOps(SelectionKey.OP_WRITE);
+					}
+				}
+			} catch (FileNotFoundException e) {
+
+			}
 		}
 	}
 
@@ -98,14 +148,17 @@ public class KeyHandler {
 	 */
 	private void handleWrite(SelectionKey key) throws IOException {
 		SocketChannel socketChannel = (SocketChannel) key.channel();
-		Request request = (Request) key.attachment();
-		HttpAppliction appliction = new HttpAppliction();
-		Response response = new Response(socketChannel);
-		try {
-			appliction.service(request, response);
-		} catch (CanNotHandleException e) {
-			LOG.error("请求类型无法处理，只支持处理GET请求");
+		FileChannel channel = (FileChannel) key.attachment();
+		buffer.clear();
+		int count = channel.read(buffer);
+		if (count > 0) {
+			buffer.flip();
+			while (buffer.hasRemaining()) {
+				socketChannel.write(buffer);
+			}
+		} else {
+			channel.close();
+			socketChannel.close();
 		}
-		socketChannel.close();
 	}
 }
