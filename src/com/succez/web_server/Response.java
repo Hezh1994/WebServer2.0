@@ -2,9 +2,6 @@ package com.succez.web_server;
 
 import java.nio.channels.SocketChannel;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.succez.util.AppOutputStream;
 
 /**
@@ -14,11 +11,9 @@ import com.succez.util.AppOutputStream;
  *
  */
 public class Response {
-	private static final Logger LOG = LoggerFactory.getLogger(Response.class);
 	private AppOutputStream outputStream;
 
 	public Response(SocketChannel socketChannel) {
-		LOG.info("响应客户端请求");
 		this.outputStream = new AppOutputStream(socketChannel);
 	}
 

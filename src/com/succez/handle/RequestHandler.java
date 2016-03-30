@@ -71,6 +71,7 @@ public class RequestHandler {
 		try {
 			File file = Seeker.getFile(request.getUrl());
 			if (file.isDirectory()) {
+				LOG.info("展开目录");
 				// 请求访问的是一个目录，将请求交给展开目录的应用进行处理
 				head = map.get("directoryHead");
 				writeHead(file, head);
@@ -84,17 +85,20 @@ public class RequestHandler {
 				String imageType = map.get("imageType");
 				if (imageType.contains(suf)) {
 					// 访问的是图片
+					LOG.info("预览图片");
 					head = map.get("image");
 					writeHead(file, head);
 
 				} else {
 					// 访问的是文件
+					LOG.info("下载文件");
 					head = map.get("fileHead");
 					writeHead(file, head);
 				}
 			}
 		} catch (FileNotFoundException e) {
 			// 访问的资源不存在
+			LOG.info("资源不存在");
 			File file = null;
 			file = new File("D:/error.html");
 			head = map.get("notFound");
