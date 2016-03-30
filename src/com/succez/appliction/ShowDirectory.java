@@ -9,20 +9,26 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.succez.exception.CanNotHandleException;
 import com.succez.exception.IsNotDirectory;
 import com.succez.util.AppOutputStream;
 import com.succez.util.Seeker;
 import com.succez.web_server.Request;
 import com.succez.web_server.Response;
 
+/**
+ * 部署在服务器上用于展开目录的应用，类似于一个servlet。
+ * 
+ * @author succez
+ *
+ */
 public class ShowDirectory implements Appliction {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(ShowDirectory.class);
 
-	@Override
-	public void service(Request request, Response response)
-			throws CanNotHandleException, IOException {
+	/**
+	 * 展开客户端访问的目录。
+	 */
+	public void service(Request request, Response response) throws IOException {
 		AppOutputStream os = response.getOutputStream();
 		File file = Seeker.getFile(request.getUrl());
 		List<File> files = null;

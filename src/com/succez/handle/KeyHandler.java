@@ -1,8 +1,6 @@
 package com.succez.handle;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
@@ -15,13 +13,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.succez.appliction.ShowDirectory;
 import com.succez.exception.CanNotHandleException;
 import com.succez.util.ConfigReader;
 import com.succez.util.Parser;
-import com.succez.util.Seeker;
 import com.succez.web_server.Request;
-import com.succez.web_server.Response;
 
 /**
  * 处理SelectionKey的类
@@ -98,45 +93,10 @@ public class KeyHandler {
 					encoding);
 			LOG.info("获取" + socketChannel.socket().getRemoteSocketAddress()
 					+ "的请求信息\n\n" + requestInfo);
-			Request request = Parser.parse(requestInfo);// 解析请求得到Request
+			Request request = Parser.parse(requestInfo);// 解析请求信息得到Request对象
 			request.setPort(socketChannel.socket().getLocalPort());
-			if (!map.get("requestType").equals(request.getRequestType())) {
-				throw new CanNotHandleException("无法处理的请求类型");
-			}
-			try {
-				File file = Seeker.getFile(request.getUrl());
-				if (file.isDirectory()) {
-					// 展开目录，由展开目录的程序进行处理
-					Response response = new Response(socketChannel);
-					byte[] bytes = map.get("directoryHead").getBytes(encoding);
-					socketChannel.write(ByteBuffer.wrap(bytes));
-					ShowDirectory app = new ShowDirectory();
-					app.service(request, response);
-					socketChannel.close();
-				} else {
-					String s = file.getName();
-					String suf = s.substring(s.indexOf(".") + 1, s.length());
-					String imageType = map.get("imageType");
-					if (imageType.contains(suf)) {
-						// 访问的是图片
-						byte[] bytes = map.get("image").getBytes(encoding);
-						socketChannel.write(ByteBuffer.wrap(bytes));
-						FileChannel channel = new FileInputStream(file)
-								.getChannel();
-						key.attach(channel);
-						key.interestOps(SelectionKey.OP_WRITE);
-					} else {
-						byte[] bytes = map.get("fileHead").getBytes(encoding);
-						socketChannel.write(ByteBuffer.wrap(bytes));
-						FileChannel channel = new FileInputStream(file)
-								.getChannel();
-						key.attach(channel);
-						key.interestOps(SelectionKey.OP_WRITE);
-					}
-				}
-			} catch (FileNotFoundException e) {
-
-			}
+			RequestHandler handler = new RequestHandler(request, key);
+			handler.processHandler();
 		}
 	}
 
@@ -148,7 +108,8 @@ public class KeyHandler {
 	 */
 	private void handleWrite(SelectionKey key) throws IOException {
 		SocketChannel socketChannel = (SocketChannel) key.channel();
-		FileChannel channel = (FileChannel) key.attachment();
+		FileInputStream is = (FileInputStream) key.attachment();
+		FileChannel channel = is.getChannel();
 		buffer.clear();
 		int count = channel.read(buffer);
 		if (count > 0) {
@@ -157,6 +118,7 @@ public class KeyHandler {
 				socketChannel.write(buffer);
 			}
 		} else {
+			is.close();
 			channel.close();
 			socketChannel.close();
 		}
