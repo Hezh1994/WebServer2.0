@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 public class WriteHandle implements Runnable {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(WriteHandle.class);
+	private static final int BUFFER_SIZE = 8192;
 	private SelectionKey key;
 
 	public WriteHandle(SelectionKey key) {
@@ -35,7 +36,7 @@ public class WriteHandle implements Runnable {
 		SocketChannel socketChannel = (SocketChannel) key.channel();
 		FileInputStream is = (FileInputStream) key.attachment();
 		FileChannel channel = is.getChannel();
-		ByteBuffer buffer = ByteBuffer.allocate(4096);
+		ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 		buffer.clear();
 		try {
 			int count = channel.read(buffer);

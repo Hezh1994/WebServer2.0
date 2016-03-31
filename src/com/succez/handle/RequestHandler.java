@@ -100,7 +100,7 @@ public class RequestHandler {
 			// 访问的资源不存在
 			LOG.info("资源不存在");
 			File file = null;
-			file = new File("D:/error.html");
+			file = new File(map.get("errorFilePath"));
 			head = map.get("notFound");
 			writeHead(file, head);
 		}

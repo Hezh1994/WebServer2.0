@@ -23,6 +23,7 @@ import com.succez.web_server.Request;
  */
 public class ReadThread implements Runnable {
 	private static final Logger LOG = LoggerFactory.getLogger(ReadThread.class);
+	private static final int BUFFER_SIZE = 4096;
 	private SelectionKey key;
 	private String encoding;
 
@@ -36,7 +37,7 @@ public class ReadThread implements Runnable {
 
 	@Override
 	public void run() {
-		ByteBuffer buffer = ByteBuffer.allocate(4096);
+		ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 		SocketChannel socket = (SocketChannel) key.channel();
 		try {
 			int bytesRead = socket.read(buffer);
