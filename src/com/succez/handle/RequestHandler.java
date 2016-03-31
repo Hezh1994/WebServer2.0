@@ -76,8 +76,7 @@ public class RequestHandler {
 				head = map.get("directoryHead");
 				writeHead(file, head);
 				Response response = new Response(socketChannel);
-				ShowDirectory app = new ShowDirectory();
-				app.service(request, response);
+				ShowDirectory.service(request, response);
 				socketChannel.close();
 			} else {
 				String s = file.getName();

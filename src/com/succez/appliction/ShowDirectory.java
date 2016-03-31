@@ -21,14 +21,15 @@ import com.succez.web_server.Response;
  * @author succez
  *
  */
-public class ShowDirectory implements Appliction {
+public class ShowDirectory {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(ShowDirectory.class);
 
 	/**
 	 * 展开客户端访问的目录。
 	 */
-	public void service(Request request, Response response) throws IOException {
+	public static void service(Request request, Response response)
+			throws IOException {
 		AppOutputStream os = response.getOutputStream();
 		File file = Seeker.getFile(request.getUrl());
 		List<File> files = null;
