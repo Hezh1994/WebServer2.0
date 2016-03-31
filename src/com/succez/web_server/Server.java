@@ -104,10 +104,18 @@ public class Server extends Thread {
 	public void shutDown() throws IOException {
 		LOG.info("关闭服务器");
 		if (selector != null) {
-			selector.close();
+			try {
+				selector.close();
+			} catch (IOException e) {
+				LOG.error("选择器关闭失败");
+			}
 		}
 		if (serverSocketChannel != null) {
-			serverSocketChannel.close();
+			try {
+				serverSocketChannel.close();
+			} catch (IOException e) {
+				LOG.error("服务端通道关闭失败");
+			}
 		}
 	}
 }
