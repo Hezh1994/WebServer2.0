@@ -7,7 +7,6 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.util.Iterator;
 import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,12 +82,11 @@ public class Server extends Thread {
 			}
 			Set<SelectionKey> keys = selector.selectedKeys();
 			Iterator<SelectionKey> iterator = keys.iterator();
-			KeyHandler handler = new KeyHandler();
 			while (iterator.hasNext()) {
 				SelectionKey key = iterator.next();
 				iterator.remove();
 				try {
-					handler.processKey(key);
+					KeyHandler.processKey(key);
 				} catch (UnableConnectException e) {
 					LOG.error("服务端通道可连接，无法与客户端建立连接");
 
