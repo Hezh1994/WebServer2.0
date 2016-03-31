@@ -11,10 +11,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.succez.exception.CanNotHandleException;
-import com.succez.exception.ReadIOException;
 import com.succez.exception.UnableConnectException;
-import com.succez.exception.WriteIOException;
 import com.succez.handle.KeyHandler;
 import com.succez.util.ConfigReader;
 
@@ -86,22 +83,16 @@ public class Server extends Thread {
 			}
 			Set<SelectionKey> keys = selector.selectedKeys();
 			Iterator<SelectionKey> iterator = keys.iterator();
-			KeyHandler handler = new KeyHandler(4096);
+			KeyHandler handler = new KeyHandler();
 			while (iterator.hasNext()) {
 				SelectionKey key = iterator.next();
 				iterator.remove();
 				try {
 					handler.processKey(key);
-				} catch (CanNotHandleException e) {
-					LOG.error("无法处理的请求类型，目前只支持处理GET请求");
 				} catch (UnableConnectException e) {
 					LOG.error("服务端通道可连接，无法与客户端建立连接");
-				} catch (ReadIOException e) {
-					LOG.error("客户端通道可读，读取客户端请求并处理时发生错误");
-				} catch (WriteIOException e) {
-					LOG.error("客户端通道可写，像客户端通道写入数据时发生错误");
-				}
 
+				}
 			}
 		}
 	}
