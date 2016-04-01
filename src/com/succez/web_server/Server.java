@@ -9,8 +9,6 @@ import java.util.Iterator;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.succez.exception.UnableConnectException;
 import com.succez.handle.KeyHandler;
 import com.succez.util.ConfigReader;
 
@@ -82,14 +80,14 @@ public class Server extends Thread {
 			}
 			Set<SelectionKey> keys = selector.selectedKeys();
 			Iterator<SelectionKey> iterator = keys.iterator();
+			KeyHandler handler = new KeyHandler(4096);
 			while (iterator.hasNext()) {
 				SelectionKey key = iterator.next();
 				iterator.remove();
 				try {
-					KeyHandler.processKey(key);
-				} catch (UnableConnectException e) {
-					LOG.error("服务端通道可连接，无法与客户端建立连接");
-
+					handler.processKey(key);
+				} catch (IOException e) {
+					LOG.error("无法处理SelectionKey：发生I/O错误");
 				}
 			}
 		}
@@ -104,18 +102,10 @@ public class Server extends Thread {
 	public void shutDown() throws IOException {
 		LOG.info("关闭服务器");
 		if (selector != null) {
-			try {
-				selector.close();
-			} catch (IOException e) {
-				LOG.error("选择器关闭失败");
-			}
+			selector.close();
 		}
 		if (serverSocketChannel != null) {
-			try {
-				serverSocketChannel.close();
-			} catch (IOException e) {
-				LOG.error("服务端通道关闭失败");
-			}
+			serverSocketChannel.close();
 		}
 	}
 }
