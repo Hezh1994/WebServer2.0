@@ -49,7 +49,7 @@ public class HttpAppliction implements Appliction {
 				// 访问的是一个目录，展开改目录
 				LOG.info("展开目录");
 				responseHead = map.get("directoryHead");
-				expandDirectory(outputStream, request, file, responseHead);
+				expandDirectory(outputStream, request, file, responseHead, map);
 			} else {
 				String s = file.getName();
 				String suf = s.substring(s.indexOf(".") + 1, s.length());
@@ -81,7 +81,7 @@ public class HttpAppliction implements Appliction {
 			responseHead = map.get("notFound");
 			File file = null;
 			try {
-				file = new File("D:/error.html");
+				file = new File(map.get("errorFilePath"));
 				outputStream.write(responseHead);
 				outputStream.write(file);
 			} catch (FileNotFoundException e1) {
@@ -98,7 +98,7 @@ public class HttpAppliction implements Appliction {
 	 * @param responseHead
 	 */
 	private void expandDirectory(AppOutputStream outputStream, Request request,
-			File file, String responseHead) {
+			File file, String responseHead, Map<String, String> map) {
 		try {
 			outputStream.write(responseHead);
 			List<File> files = null;
@@ -117,8 +117,8 @@ public class HttpAppliction implements Appliction {
 			outputStream.write("<p style=\"color:blue\">当前路径"
 					+ request.getUrl() + "下的内容为:</p>");
 			for (File f : files) {
-				outputStream.write("<a href=\"http://192.168.13.157:"
-						+ request.getPort() + request.getUrl() + "/"
+				outputStream.write("<a href=\"http://" + map.get("ip") + ":"
+						+ map.get("port") + request.getUrl() + "/"
 						+ f.getName() + "\">");
 				outputStream.write(f.getName() + "</a>");
 				outputStream.write("<br />");

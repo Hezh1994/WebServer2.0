@@ -23,6 +23,7 @@ public class AppOutputStream {
 			.getLogger(AppOutputStream.class);
 	private SocketChannel socketChannel;
 	private String encoding;
+	private static final int BUFFER_SIZE = 8192;
 
 	public AppOutputStream(SocketChannel socketChannel) {
 		super();
@@ -60,7 +61,7 @@ public class AppOutputStream {
 	public void write(File file) throws IOException {
 		DataInputStream is = new DataInputStream(new BufferedInputStream(
 				new FileInputStream(file)));
-		ByteBuffer buffer = ByteBuffer.allocate(4096);
+		ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 		long fileLength = file.length();
 		int len = (int) (fileLength > 4096 ? 4096 : fileLength);
 		byte[] bytes = new byte[len];

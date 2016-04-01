@@ -58,8 +58,7 @@ public class Server extends Thread {
 		this.port = Integer.valueOf(reader.getMap().get("port"));
 		this.selector = Selector.open();
 		this.serverSocketChannel = ServerSocketChannel.open();
-		this.serverSocketChannel.socket().bind(
-				new InetSocketAddress(Integer.valueOf(port)));
+		this.serverSocketChannel.socket().bind(new InetSocketAddress(port));
 		this.serverSocketChannel.configureBlocking(false);
 		this.serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
 	}
@@ -80,12 +79,11 @@ public class Server extends Thread {
 			}
 			Set<SelectionKey> keys = selector.selectedKeys();
 			Iterator<SelectionKey> iterator = keys.iterator();
-			KeyHandler handler = new KeyHandler(4096);
 			while (iterator.hasNext()) {
 				SelectionKey key = iterator.next();
 				iterator.remove();
 				try {
-					handler.processKey(key);
+					KeyHandler.processKey(key);
 				} catch (IOException e) {
 					LOG.error("无法处理SelectionKey：发生I/O错误");
 				}

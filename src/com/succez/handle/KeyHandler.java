@@ -23,11 +23,7 @@ import com.succez.web_server.Response;
  */
 public class KeyHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(KeyHandler.class);
-	private ByteBuffer buffer;
-
-	public KeyHandler(int BufferSize) {
-		this.buffer = ByteBuffer.allocate(BufferSize);
-	}
+	private static final int BUFFER_SIZE = 4096;
 
 	/**
 	 * 处理SelectionKey，判断key所关联的通道的状态
@@ -35,7 +31,7 @@ public class KeyHandler {
 	 * @param key
 	 * @throws IOException
 	 */
-	public void processKey(SelectionKey key) throws IOException {
+	public static void processKey(SelectionKey key) throws IOException {
 		if (key.isValid() && key.isAcceptable()) {
 			handleAccept(key);
 		}
@@ -48,7 +44,7 @@ public class KeyHandler {
 	}
 
 	// 服务端通道已经准备好接受新的客户端连接。将新注册的客户端通道注册到选择器，设置该通道关联的key的属性为OP_READ
-	private void handleAccept(SelectionKey key) throws IOException {
+	private static void handleAccept(SelectionKey key) throws IOException {
 		// 获取客户端通道
 		ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key
 				.channel();
@@ -61,8 +57,9 @@ public class KeyHandler {
 	}
 
 	// 客户端通道已经准备好读取数据到缓冲区中。将通道中的数据读取到缓冲区中，然后对读取到缓冲区中的HttpRequest进行解析得到Request
-	private void handleRead(SelectionKey key) throws IOException {
+	private static void handleRead(SelectionKey key) throws IOException {
 		SocketChannel socketChannel = (SocketChannel) key.channel();
+		ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 		buffer.clear();
 		int bytesRead = socketChannel.read(buffer);
 		if (bytesRead == -1) {
@@ -82,8 +79,7 @@ public class KeyHandler {
 					"utf-8");
 			LOG.info("获取" + socketChannel.socket().getRemoteSocketAddress()
 					+ "的请求信息\n\n" + requestInfo);
-			Request request = Parser.parse(requestInfo);// 解析请求得到Request
-			request.setPort(socketChannel.socket().getLocalPort());
+			Request request = Parser.parse(requestInfo);// 解析请求得到RequestS
 			key.attach(request);
 			key.interestOps(SelectionKey.OP_WRITE);
 		}
@@ -95,7 +91,7 @@ public class KeyHandler {
 	 * @param key
 	 * @throws IOException
 	 */
-	private void handleWrite(SelectionKey key) throws IOException {
+	private static void handleWrite(SelectionKey key) throws IOException {
 		SocketChannel socketChannel = (SocketChannel) key.channel();
 		Request request = (Request) key.attachment();
 		HttpAppliction app = new HttpAppliction();

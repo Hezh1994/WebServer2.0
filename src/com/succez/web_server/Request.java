@@ -10,7 +10,6 @@ public class Request {
 	private String requestType;
 	private String url;
 	private String RANGE;
-	private int port;
 
 	public Request() {
 
@@ -105,13 +104,4 @@ public class Request {
 			return false;
 		return true;
 	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
-	}
-
 }
